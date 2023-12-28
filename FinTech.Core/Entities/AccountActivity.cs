@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.Entities
 {
-    public class Transaction : BaseEntity<Guid>
+    public class AccountActivity : BaseEntity<Guid>
     {
         public Guid AccountId { get; set; }
         public Account Account { get; set; }

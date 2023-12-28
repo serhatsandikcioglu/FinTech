@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.Entities
 {
-    public class LoanApplication : BaseEntity<Guid>
+    public class MoneyTransfer : BaseEntity<Guid>
     {
-        public Guid ApplicationUserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
+        public Guid SenderAccountId { get; set; }
+        public string ReceiverAccountNumber { get; set; }
         public decimal Amount { get; set; }
-        public bool Status { get; set; }
+        public DateTime Date { get; set; }
     }
 }

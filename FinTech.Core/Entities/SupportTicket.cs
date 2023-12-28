@@ -10,7 +10,7 @@ namespace FinTech.Core.Entities
 {
     public class SupportTicket : BaseEntity<Guid>
     {
-        public Guid UesrId { get; set; }
+        public Guid ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
         public DateTime CreatedDate { get; set; }
         public TicketStatus TicketStatus { get; set; }
