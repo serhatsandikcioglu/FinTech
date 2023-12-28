@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinTech.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/moneyTransfers")]
     [ApiController]
     public class MoneyTransferController : CustomBaseController
     {

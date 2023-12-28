@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinTech.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/accounts")]
     [ApiController]
     public class AccountController : CustomBaseController
     {
@@ -28,8 +28,8 @@ namespace FinTech.API.Controllers
         {
             return CreateActionResultInstance(_accountService.GetBalanceByAccountId(accountId));
         }
-        [HttpPut("{accountId}")]
-        public async Task<ActionResult<CustomResponse<NoContent>>> Patch(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
+        [HttpPut("{accountId}/balance")]
+        public async Task<ActionResult<CustomResponse<NoContent>>> UpdateBalance(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
         {
             return CreateActionResultInstance(_accountService.Update(accountId,balanceUpdateDTO));
         }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinTech.API.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/accountActivities")]
     [ApiController]
     public class AccountActivityController : CustomBaseController
     {
@@ -17,12 +17,12 @@ namespace FinTech.API.Controllers
         {
             _accountActivityService = accountActivityService;
         }
-        [HttpPost("{accountId}")]
+        [HttpPost("{accountId}/[action]")]
         public async Task<ActionResult<CustomResponse<AccountActivityDTO>>> Withdrawal(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
         {
             return CreateActionResultInstance( _accountActivityService.Withdrawal(accountId, accountActivityCreateDTO));
         }
-        [HttpPost("{accountId}")]
+        [HttpPost("{accountId}/[action]")]
         public async Task<ActionResult<CustomResponse<AccountActivityDTO>>> Deposit(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
         {
             return CreateActionResultInstance(_accountActivityService.Deposit(accountId, accountActivityCreateDTO));

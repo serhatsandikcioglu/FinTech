@@ -10,7 +10,7 @@ namespace FinTech.Service.Interfaces
 {
     public interface IAccountActivityService
     {
-        CustomResponse<AccountActivityDTO> Deposit(Guid userId, AccountActivityCreateDTO accountActivityCreateDTO);
-        CustomResponse<AccountActivityDTO> Withdrawal(Guid userId, AccountActivityCreateDTO accountActivityCreateDTO);
+        CustomResponse<AccountActivityDTO> Deposit(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO);
+        CustomResponse<AccountActivityDTO> Withdrawal(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO);
     }
 }
