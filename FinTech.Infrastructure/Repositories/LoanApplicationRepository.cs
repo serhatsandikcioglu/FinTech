@@ -37,5 +37,9 @@ namespace FinTech.Infrastructure.Repositories
         {
            return await _dbSet.Where(x => x.Id == loanApplicationId).FirstOrDefaultAsync();
         }
+        public async Task<List<LoanApplication>> GetAllByUserIdAsync(Guid UserId)
+        {
+            return await _dbSet.Where(l => l.ApplicationUserId == UserId).ToListAsync();
+        }
     }
 }

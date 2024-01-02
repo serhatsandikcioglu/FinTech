@@ -13,5 +13,6 @@ namespace FinTech.Core.Interfaces
         Task AddAsync(LoanApplication loanApplication);
         Task<List<PaymentStatus>>? GetPaymentStatusesByUserIdAsync(Guid applicationUserId);
         Task<LoanApplication> GetByIdAsync(Guid loanApplicationId);
+        Task<List<LoanApplication>> GetAllByUserIdAsync(Guid UserId);
     }
 }

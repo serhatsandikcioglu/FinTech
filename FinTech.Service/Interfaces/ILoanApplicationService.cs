@@ -12,5 +12,6 @@ namespace FinTech.Service.Interfaces
     {
         Task<CustomResponse<LoanApplicationDTO>> CreateAsync(Guid userId, LoanApplicationCreateDTO loanApplicationCreateDTO);
         Task<CustomResponse<NoContent>> LoanApplicationEvaluationAsync(Guid loanApplicationId, LoanApplicationEvaluationDTO loanApplicationEvaluationDTO);
+        Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserId(Guid userId);
     }
 }
