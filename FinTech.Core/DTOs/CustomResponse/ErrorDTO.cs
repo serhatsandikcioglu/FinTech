@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace FinTech.Shared.DTOs
+namespace FinTech.Core.DTOs.CustomResponse
 {
     public class ErrorDTO
     {

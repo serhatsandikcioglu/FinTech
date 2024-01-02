@@ -1,5 +1,4 @@
-﻿using FinTech.Shared.DTOs;
-using Newtonsoft.Json;
+﻿using FinTech.Core.DTOs.CustomResponse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,23 +7,23 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace FinTech.Shared.Models
+namespace FinTech.Core.Models
 {
     public record CustomResponse<T>
     {
         [JsonPropertyName("data")] public T Data { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore] public int StatusCode { get; set; }
+        [JsonIgnore] public int StatusCode { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore] public bool Succeeded { get; private set; }
+        [JsonIgnore] public bool Succeeded { get; private set; }
 
-        [Newtonsoft.Json.JsonIgnore] public object[] Args { get; private set; }
+        [JsonIgnore] public object[] Args { get; private set; }
 
         [JsonPropertyName("error")] public ErrorDTO Error { get; set; }
 
         public override string ToString()
         {
-            return Succeeded ? "Succeeded" : $"Failed : {JsonConvert.SerializeObject(Error)}";
+            return Succeeded ? "Succeeded" : $"Failed : {JsonSerializer.Serialize(Error)}";
         }
         public static CustomResponse<T> Success(int statusCode, T data)
         {
@@ -41,6 +40,15 @@ namespace FinTech.Shared.Models
             {
                 StatusCode = statusCode,
                 Error = new ErrorDTO { Details = new List<string> { error } },
+                Succeeded = false
+            };
+        }
+        public static CustomResponse<T> Fail(int statusCode, List<string> errors)
+        {
+            return new CustomResponse<T>
+            {
+                StatusCode = statusCode,
+                Error = new ErrorDTO { Details = errors },
                 Succeeded = false
             };
         }

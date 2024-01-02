@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FinTech.Infrastructure.Migrations
 {
     [DbContext(typeof(FinTechDbContext))]
-    [Migration("20231227164323_initial")]
+    [Migration("20240102092043_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -34,14 +34,16 @@ namespace FinTech.Infrastructure.Migrations
                     b.Property<Guid>("ApplicationUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
-
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
 
                     b.ToTable("Accounts");
                 });
@@ -107,6 +109,10 @@ namespace FinTech.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -127,6 +133,9 @@ namespace FinTech.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MonthlyIncome")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -206,8 +215,18 @@ namespace FinTech.Infrastructure.Migrations
                     b.Property<Guid>("ApplicationUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
+                    b.Property<string>("CreditScoreResultComment")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MaturityTerm")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -228,9 +247,8 @@ namespace FinTech.Infrastructure.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ReceiverAccountNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("ReceiverAccountId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SenderAccountId")
                         .HasColumnType("uuid");
@@ -238,6 +256,34 @@ namespace FinTech.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MoneyTransfers");
+                });
+
+            modelBuilder.Entity("FinTech.Core.Entities.RepaymentPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("AmountDue")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("InstallmentNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("LoanApplicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoanApplicationId");
+
+                    b.ToTable("RepaymentPlans");
                 });
 
             modelBuilder.Entity("FinTech.Core.Entities.SupportTicket", b =>
@@ -252,11 +298,14 @@ namespace FinTech.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TicketDescription")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("TicketStatus")
+                    b.Property<int?>("PriorityLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -369,10 +418,21 @@ namespace FinTech.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FinTech.Core.Entities.Account", b =>
+                {
+                    b.HasOne("FinTech.Core.Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany("Accounts")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("FinTech.Core.Entities.AccountActivity", b =>
                 {
                     b.HasOne("FinTech.Core.Entities.Account", "Account")
-                        .WithMany()
+                        .WithMany("AccountActivities")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -383,7 +443,7 @@ namespace FinTech.Infrastructure.Migrations
             modelBuilder.Entity("FinTech.Core.Entities.AutomaticPayment", b =>
                 {
                     b.HasOne("FinTech.Core.Entities.Account", "Account")
-                        .WithMany()
+                        .WithMany("AutomaticPayments")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -394,7 +454,7 @@ namespace FinTech.Infrastructure.Migrations
             modelBuilder.Entity("FinTech.Core.Entities.LoanApplication", b =>
                 {
                     b.HasOne("FinTech.Core.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("LoanApplications")
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -402,10 +462,21 @@ namespace FinTech.Infrastructure.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("FinTech.Core.Entities.RepaymentPlan", b =>
+                {
+                    b.HasOne("FinTech.Core.Entities.LoanApplication", "LoanApplication")
+                        .WithMany("RepaymentPlans")
+                        .HasForeignKey("LoanApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LoanApplication");
+                });
+
             modelBuilder.Entity("FinTech.Core.Entities.SupportTicket", b =>
                 {
                     b.HasOne("FinTech.Core.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("SupportTickets")
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -462,6 +533,27 @@ namespace FinTech.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FinTech.Core.Entities.Account", b =>
+                {
+                    b.Navigation("AccountActivities");
+
+                    b.Navigation("AutomaticPayments");
+                });
+
+            modelBuilder.Entity("FinTech.Core.Entities.ApplicationUser", b =>
+                {
+                    b.Navigation("Accounts");
+
+                    b.Navigation("LoanApplications");
+
+                    b.Navigation("SupportTickets");
+                });
+
+            modelBuilder.Entity("FinTech.Core.Entities.LoanApplication", b =>
+                {
+                    b.Navigation("RepaymentPlans");
                 });
 #pragma warning restore 612, 618
         }

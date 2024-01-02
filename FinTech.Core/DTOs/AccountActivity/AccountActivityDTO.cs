@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinTech.Core.DTOs
+namespace FinTech.Core.DTOs.AccountActivity
 {
     public class AccountActivityDTO
     {

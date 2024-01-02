@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinTech.Core.DTOs
+namespace FinTech.Core.Models
 {
-    public class BalanceDTO
+    public struct NoContent
     {
-        public decimal Balance { get; set; }
     }
 }

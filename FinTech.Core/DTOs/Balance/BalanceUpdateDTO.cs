@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinTech.Core.DTOs
+namespace FinTech.Core.DTOs.Balance
 {
     public class BalanceUpdateDTO
     {

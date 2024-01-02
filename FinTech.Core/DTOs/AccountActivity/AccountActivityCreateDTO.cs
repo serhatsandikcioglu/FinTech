@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinTech.Core.DTOs
+namespace FinTech.Core.DTOs.AccountActivity
 {
     public class AccountActivityCreateDTO
     {
         public decimal Amount { get; set; }
+        public TransactionType TransactionType { get; set; }
     }
 }

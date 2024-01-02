@@ -8,7 +8,7 @@ using System.Transactions;
 
 namespace FinTech.Shared.Constans
 {
-    public class MoneyTransferConstants
+    public static class MoneyTransferConstants
     {
         public const decimal DailyTransferLimit = 50000;
         public const decimal PerTransactionTransferLimit = 30000;
