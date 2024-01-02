@@ -1,4 +1,4 @@
-﻿using FinTech.Core.DTOs;
+﻿using FinTech.Core.DTOs.Balance;
 using FluentValidation;
 using System;
 using System.Collections.Generic;

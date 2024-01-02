@@ -1,4 +1,4 @@
-﻿using FinTech.Core.DTOs;
+﻿using FinTech.Core.DTOs.Account;
 using FinTech.Shared.Constans;
 using FluentValidation;
 using System;
