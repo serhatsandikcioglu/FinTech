@@ -13,7 +13,10 @@ namespace FinTech.Core.Interfaces
         IAccountRepository AccountRepository { get; }
         IAccountActivityRepository AccountActivityRepository { get; }
         IMoneyTransferRepository MoneyTransferRepository { get; }
-        void SaveChanges();
+        ILoanApplicationRepository LoanApplicationRepository { get; }
+        IRepaymentPlanRepository RepaymentPlanRepository { get; }
+        ISupportTicketRepository SupportTicketRepository { get; }
+        Task SaveChangesAsync();
         IDbContextTransaction Transaction { get; }
         Task BeginTransactionAsync();
         Task CommitAsync();

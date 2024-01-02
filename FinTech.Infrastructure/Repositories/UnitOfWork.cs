@@ -22,10 +22,21 @@ namespace FinTech.Infrastructure.Repositories
             _serviceProvider = serviceProvider;
         }
 
-
+        private ISupportTicketRepository _supportTicketRepository;
         private IAccountRepository _accountRepository;
         private IAccountActivityRepository _accountActivityRepository;
         private IMoneyTransferRepository _moneyTransferRepository;
+        private ILoanApplicationRepository _loanApplicationRepository;
+        private IRepaymentPlanRepository _repaymentPlanRepository;
+        public ISupportTicketRepository SupportTicketRepository
+        {
+            get
+            {
+                if (_supportTicketRepository == default(ISupportTicketRepository))
+                    _supportTicketRepository = _serviceProvider.GetRequiredService<ISupportTicketRepository>();
+                return _supportTicketRepository;
+            }
+        }
         public IAccountRepository AccountRepository
         {
             get
@@ -34,7 +45,6 @@ namespace FinTech.Infrastructure.Repositories
                     _accountRepository = _serviceProvider.GetRequiredService<IAccountRepository>();
                 return _accountRepository;
             }
-
         }
         public IAccountActivityRepository AccountActivityRepository
         {
@@ -44,7 +54,6 @@ namespace FinTech.Infrastructure.Repositories
                     _accountActivityRepository = _serviceProvider.GetRequiredService<IAccountActivityRepository>();
                 return _accountActivityRepository;
             }
-
         }
         public IMoneyTransferRepository MoneyTransferRepository
         {
@@ -54,16 +63,31 @@ namespace FinTech.Infrastructure.Repositories
                     _moneyTransferRepository = _serviceProvider.GetRequiredService<IMoneyTransferRepository>();
                 return _moneyTransferRepository;
             }
-
         }
-
+        public ILoanApplicationRepository LoanApplicationRepository
+        {
+            get
+            {
+                if (_loanApplicationRepository == default(ILoanApplicationRepository))
+                    _loanApplicationRepository = _serviceProvider.GetRequiredService<ILoanApplicationRepository>();
+                return _loanApplicationRepository;
+            }
+        }
+        public IRepaymentPlanRepository RepaymentPlanRepository
+        {
+            get
+            {
+                if (_repaymentPlanRepository == default(IRepaymentPlanRepository))
+                    _repaymentPlanRepository = _serviceProvider.GetRequiredService<IRepaymentPlanRepository>();
+                return _repaymentPlanRepository;
+            }
+        }
         public IDbContextTransaction Transaction { get; private set; }
 
         public async Task BeginTransactionAsync()
         {
             Transaction = await _finTechDbContext.Database.BeginTransactionAsync();
         }
-
         public async Task CommitAsync()
         {
             if (Transaction == null)
@@ -71,7 +95,6 @@ namespace FinTech.Infrastructure.Repositories
             await Transaction.CommitAsync();
             Transaction = null;
         }
-
         public async Task RollbackAsync()
         {
             if (Transaction == null)
@@ -79,12 +102,10 @@ namespace FinTech.Infrastructure.Repositories
             await Transaction.RollbackAsync();
             Transaction = null;
         }
-
-        public void SaveChanges()
+        public async Task SaveChangesAsync()
         {
-            _finTechDbContext.SaveChanges();
+           await _finTechDbContext.SaveChangesAsync();
         }
-
         public void Dispose()
         {
             _finTechDbContext.Dispose();
