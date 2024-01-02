@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FinTech.Core.Constans
+{
+    public static class RoleConstants
+    {
+        public const string Manager = "manager";
+        public const string LoanOfficer = "loanOfficer";
+        public const string SupportTicketAnalyst = "supportTicketAnalyst";
+        public const string CustomerSupport = "customerSupport";
+        public const string Customer = "customer";
+    }
+}
