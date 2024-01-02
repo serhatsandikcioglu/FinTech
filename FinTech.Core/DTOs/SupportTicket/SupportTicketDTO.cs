@@ -1,17 +1,17 @@
-﻿using FinTech.Core.Enums;
+﻿using FinTech.Core.Entities;
+using FinTech.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinTech.Core.Entities
+namespace FinTech.Core.DTOs.SupportTicket
 {
-    public class SupportTicket : BaseEntity<Guid>
+    public class SupportTicketDTO
     {
+        public Guid Id { get; set; }
         public Guid ApplicationUserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
         public DateTime CreatedDate { get; set; }
         public TicketPriorityLevel? PriorityLevel { get; set; }
         public TicketStatus Status { get; set; }
