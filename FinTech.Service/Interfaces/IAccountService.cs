@@ -1,6 +1,7 @@
-﻿using FinTech.Core.DTOs;
+﻿using FinTech.Core.DTOs.Account;
+using FinTech.Core.DTOs.Balance;
 using FinTech.Core.Entities;
-using FinTech.Shared.Models;
+using FinTech.Core.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,9 @@ namespace FinTech.Service.Interfaces
 {
     public interface IAccountService
     {
-        CustomResponse<AccountDTO> Create(AccountCreateDTO accountCreateDTO);
-        string CreateAccountNumber();
-        CustomResponse<BalanceDTO> GetBalanceByAccountId(Guid accountId);
-        CustomResponse<NoContent> Update(Guid accountId, BalanceUpdateDTO balanceUpdateDTO);
+        Task<CustomResponse<AccountDTO>> CreateAccountWithoutRulesAsync(Guid userId, AccountCreateDTO accountCreateDTO);
+        Task<CustomResponse<BalanceDTO>> GetBalanceByAccountIdAsync(Guid accountId);
+        Task<CustomResponse<BalanceDTO>> UpdateBalanceAsync(Guid accountId, BalanceUpdateDTO balanceUpdateDTO);
+        Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(Guid userId, AccountCreateDTO accountCreateDTO);
     }
 }

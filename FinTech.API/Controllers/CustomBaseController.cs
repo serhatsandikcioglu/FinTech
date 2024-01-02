@@ -1,4 +1,4 @@
-﻿using FinTech.Shared.Models;
+﻿using FinTech.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

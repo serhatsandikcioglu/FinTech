@@ -11,11 +11,11 @@ namespace FinTech.Core.Interfaces
 {
     public interface IAccountRepository
     {
-        void Add(Account account);
-        public string GetBiggestAccountNumber();
-        decimal GetBalanceByAccountId(Guid accountId);
-        bool AccountIsExist(Guid accountId);
-        Account GetById(Guid accountId);
-        Account GetByAccountNumber(string accountNumber);
+        Task AddAsync(Account account);
+        Task<string> GetBiggestAccountNumberAsync();
+        Task<bool> AccountIsExistAsync(Guid accountId);
+        Task<Account> GetByIdAsync(Guid accountId);
+        Task<Account> GetByAccountNumberAsync(string accountNumber);
+        Task<bool> AccountIsExistByAccountNumberAsync(string accountNumber);
     }
 }

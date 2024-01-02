@@ -1,6 +1,6 @@
-﻿using FinTech.Core.DTOs;
+﻿using FinTech.Core.DTOs.MoneyTransfer;
 using FinTech.Core.Entities;
-using FinTech.Shared.Models;
+using FinTech.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,6 @@ namespace FinTech.Service.Interfaces
 {
     public interface IMoneyTransferService
     {
-        CustomResponse<NoContent> Create(MoneyTransferCreateDTO moneyTransferCreateDTO);
-        bool CalculateDailyTransferLimit(Guid accountId, decimal amount);
+        Task<CustomResponse<NoContent>> CreateAsync(MoneyTransferCreateDTO moneyTransferCreateDTO);
     }
 }

@@ -19,9 +19,13 @@ namespace FinTech.Infrastructure.Repositories
             _dbSet = finTechDbContext.Set<AccountActivity>();
         }
 
-        public void Add(AccountActivity accountActivity)
+        public async Task AddAsync(AccountActivity accountActivity)
         {
-            _dbSet.Add(accountActivity);
+          await  _dbSet.AddAsync(accountActivity);
+        }
+        public async Task<List<AccountActivity>> GetAllByAccountIdAsync(Guid accountId)
+        {
+            return await _dbSet.Where(x=>x.AccountId == accountId).ToListAsync();
         }
     }
 }

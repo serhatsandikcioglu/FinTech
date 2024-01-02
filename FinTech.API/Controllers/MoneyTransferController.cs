@@ -1,9 +1,10 @@
-﻿using FinTech.Core.DTOs;
-using FinTech.Service.Interfaces;
+﻿using FinTech.Service.Interfaces;
 using FinTech.Service.Services;
-using FinTech.Shared.Models;
+using FinTech.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FinTech.Core.DTOs.MoneyTransfer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinTech.API.Controllers
 {
@@ -18,9 +19,11 @@ namespace FinTech.API.Controllers
             _moneyTransferService = moneyTransferService;
         }
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "customer")]
         public async Task<ActionResult<CustomResponse<NoContent>>> Create(MoneyTransferCreateDTO moneyTransferCreateDTO)
         {
-            return CreateActionResultInstance(_moneyTransferService.Create(moneyTransferCreateDTO));
+            return CreateActionResultInstance( await _moneyTransferService.CreateAsync(moneyTransferCreateDTO));
         }
     }
 }

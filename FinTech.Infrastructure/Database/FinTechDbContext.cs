@@ -16,11 +16,20 @@ namespace FinTech.Infrastructure.Database
         public FinTechDbContext(DbContextOptions<FinTechDbContext> options) : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Account>()
+                .HasIndex(a => a.Number)
+                .IsUnique();
+        }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<AccountActivity> AccountActivities { get; set; }
         public DbSet<AutomaticPayment> AutomaticPayments { get; set; }
         public DbSet<LoanApplication> LoanApplications { get; set; }
         public DbSet<MoneyTransfer> MoneyTransfers { get; set; }
         public DbSet<SupportTicket> SupportTickets { get; set; }
+        public DbSet<RepaymentPlan> RepaymentPlans { get; set; }
     }
 }

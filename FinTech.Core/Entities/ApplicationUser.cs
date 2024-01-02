@@ -12,5 +12,10 @@ namespace FinTech.Core.Entities
         public string Name { get; set; }
         public string Surname { get; set; }
         public string IdentityNumber { get; set; }
+        public string Address { get; set; }
+        public int MonthlyIncome { get; set; }
+        public List<Account> Accounts { get; set; }
+        public List<LoanApplication> LoanApplications { get; set; }
+        public List<SupportTicket> SupportTickets { get; set; }
     }
 }

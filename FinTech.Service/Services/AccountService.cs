@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using FinTech.Core.DTOs;
 using FinTech.Core.Entities;
+using FinTech.Core.Enums;
 using FinTech.Core.Interfaces;
 using FinTech.Service.Interfaces;
 using FinTech.Shared.Constans;
-using FinTech.Shared.Models;
+using FinTech.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
@@ -16,6 +16,10 @@ using System.Net;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using FinTech.Core.DTOs.Account;
+using FinTech.Core.DTOs.Balance;
+using FinTech.Core.DTOs.AccountActivity;
+using FinTech.Core.Constans;
 
 namespace FinTech.Service.Services
 {
@@ -23,66 +27,147 @@ namespace FinTech.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public AccountService(IMapper mapper, IUnitOfWork unitOfWork)
+        private readonly IAccountActivityService _accountActivityService;
+        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        public AccountService(IMapper mapper, IUnitOfWork unitOfWork, IAccountActivityService accountActivityService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _accountActivityService = accountActivityService;
         }
 
-        public CustomResponse< AccountDTO> Create(AccountCreateDTO accountCreateDTO)
+        public async Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(Guid applicationUserId, AccountCreateDTO accountCreateDTO)
         {
-            if (accountCreateDTO.Balance < AccountConstants.MinimumInitialBalance) 
-                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, "Initial account balance must be above the account opening limit.");
-            Account account = _mapper.Map<Account>(accountCreateDTO);
-            account.Number = CreateAccountNumber();
-            _unitOfWork.AccountRepository.Add(account);
-            _unitOfWork.SaveChanges();
-            AccountDTO accountDTO = _mapper.Map<AccountDTO>(account);
-            return CustomResponse<AccountDTO>.Success(StatusCodes.Status201Created, accountDTO);
+            if (accountCreateDTO.Balance < AccountConstants.MinimumInitialBalance)
+                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InitialBalanceError);
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+                var accountResponse = await CreateAccountWithoutRulesAsync(applicationUserId, accountCreateDTO);
+                await AccountActivityCreateProcess(accountCreateDTO.SenderAccountId,TransactionType.Withdrawal,accountCreateDTO.Balance);
+                await AccountActivityCreateProcess(accountResponse.Data.Id, TransactionType.Deposit, accountCreateDTO.Balance);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
+                return CustomResponse<AccountDTO>.Success(StatusCodes.Status201Created, accountResponse.Data);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackAsync();
+                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+            }
         }
-
-        public string CreateAccountNumber()
+        public async Task<CustomResponse<AccountDTO>> CreateAccountWithoutRulesAsync(Guid applicationUserId, AccountCreateDTO accountCreateDTO)
+        {
+            try
+            {
+                Account account = _mapper.Map<Account>(accountCreateDTO);
+                account.ApplicationUserId = applicationUserId;
+                account.Number = await CreateAccountNumberAsync();
+                await _unitOfWork.AccountRepository.AddAsync(account);
+                await _unitOfWork.SaveChangesAsync();
+                AccountDTO accountDTO = _mapper.Map<AccountDTO>(account);
+                return CustomResponse<AccountDTO>.Success(StatusCodes.Status201Created, accountDTO);
+            }
+            catch (Exception ex)
+            {
+                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+            }
+                
+        }
+        private async Task<string> CreateAccountNumberAsync()
         {
             int maxAccountNumberLength = 6;
-            _unitOfWork.BeginTransactionAsync();
-                try
-                {
-                    string biggestAccountNumber = _unitOfWork.AccountRepository.GetBiggestAccountNumber();
-                    BigInteger newAccountNumber = BigInteger.Parse(biggestAccountNumber ?? "0") + 1;
-                    string newAccountNumberString = $"{newAccountNumber:D}";
-                    newAccountNumberString = newAccountNumberString.PadLeft(maxAccountNumberLength, '0');
-                    _unitOfWork.CommitAsync();
-                    return newAccountNumberString;
-                }
-                catch (Exception ex)
-                {
-                    _unitOfWork.RollbackAsync();
-                    throw;
-                }
+            try
+            {
+                await _semaphoreSlim.WaitAsync();
+
+                string biggestAccountNumber = await _unitOfWork.AccountRepository.GetBiggestAccountNumberAsync();
+                BigInteger newAccountNumber = BigInteger.Parse(biggestAccountNumber ?? "0") + 1;
+                string newAccountNumberString = $"{newAccountNumber:D}";
+                newAccountNumberString = newAccountNumberString.PadLeft(maxAccountNumberLength, '0');
+                return newAccountNumberString;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error creating account number", ex);
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
         }
 
-        public CustomResponse<BalanceDTO> GetBalanceByAccountId(Guid accountId)
+        public async Task<CustomResponse<BalanceDTO>> GetBalanceByAccountIdAsync(Guid accountId)
         {
-            bool accountExist = _unitOfWork.AccountRepository.AccountIsExist(accountId);
+            bool accountExist = await _unitOfWork.AccountRepository.AccountIsExistAsync(accountId);
             if (!accountExist)
-                 return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status404NotFound, "Account Not Found");
-            
-            BalanceDTO balanceDTO = new BalanceDTO();
-            balanceDTO.Balance =  _unitOfWork.AccountRepository.GetBalanceByAccountId(accountId);
+                return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.AccountNotFound);
+            var accountActivities = await _unitOfWork.AccountActivityRepository.GetAllByAccountIdAsync(accountId);
+            decimal totalBalance = 0;
+
+            foreach (var activity in accountActivities)
+            {
+                if (activity.TransactionType == TransactionType.Deposit)
+                {
+                    totalBalance += activity.Amount;
+                }
+                else if (activity.TransactionType == TransactionType.Withdrawal)
+                {
+                    totalBalance -= activity.Amount;
+                }
+            }
+            BalanceDTO balanceDTO = new BalanceDTO
+            {
+                Balance = totalBalance
+            };
             return CustomResponse<BalanceDTO>.Success(StatusCodes.Status200OK, balanceDTO);
-            
         }
-        public CustomResponse<NoContent> Update(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
+        public async Task<CustomResponse<BalanceDTO>> UpdateBalanceAsync(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
         {
-            Account account = _unitOfWork.AccountRepository.GetById(accountId);
+            Account account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId);
             if (account == null)
-                return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, "Account Not Found");
+                return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
             if (balanceUpdateDTO.Balance < 0)
-                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, "Balance cannot be less than 0");
-            account.Balance = balanceUpdateDTO.Balance;
-            _unitOfWork.SaveChanges();
-            return CustomResponse<NoContent>.Success(StatusCodes.Status200OK);
+                return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.MinBalanceError);
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+                var currentBalance = (await GetBalanceByAccountIdAsync(accountId)).Data.Balance;
+                var changeAmount = balanceUpdateDTO.Balance - currentBalance;
+
+                if (changeAmount > 0)
+                {
+                    await AccountActivityCreateProcess(accountId, TransactionType.Deposit, changeAmount);
+                }
+                else if (changeAmount < 0)
+                {
+                    await AccountActivityCreateProcess(accountId, TransactionType.Withdrawal, Math.Abs(changeAmount));
+                }
+                BalanceDTO balanceDTO = _mapper.Map<BalanceDTO>(balanceUpdateDTO);
+                await _unitOfWork.CommitAsync();
+                return CustomResponse<BalanceDTO>.Success(StatusCodes.Status200OK,balanceDTO);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackAsync();
+                return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+            }
+        }
+
+        private async Task AccountActivityCreateProcess(Guid accountId, TransactionType transactionType, decimal amount)
+        {
+            var accountActivityCreateDTO = new AccountActivityCreateDTO
+            {
+                Amount = amount,
+                TransactionType = transactionType
+            };
+
+            var processResponse = await _accountActivityService.CreateAsync(accountId, accountActivityCreateDTO);
+
+            if (!processResponse.Succeeded)
+            {
+                throw new Exception(processResponse.Error.Details[0].ToString());
+            }
         }
     }
 }

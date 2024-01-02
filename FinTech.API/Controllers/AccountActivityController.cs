@@ -1,9 +1,10 @@
-﻿using FinTech.Core.DTOs;
-using FinTech.Core.Entities;
+﻿using FinTech.Core.Entities;
 using FinTech.Service.Interfaces;
-using FinTech.Shared.Models;
+using FinTech.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FinTech.Core.DTOs.AccountActivity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinTech.API.Controllers
 {
@@ -17,15 +18,12 @@ namespace FinTech.API.Controllers
         {
             _accountActivityService = accountActivityService;
         }
-        [HttpPost("{accountId}/[action]")]
-        public async Task<ActionResult<CustomResponse<AccountActivityDTO>>> Withdrawal(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
+        [HttpPost("{accountId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "customer")]
+        public async Task<ActionResult<CustomResponse<AccountActivityDTO>>> Create(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
         {
-            return CreateActionResultInstance( _accountActivityService.Withdrawal(accountId, accountActivityCreateDTO));
-        }
-        [HttpPost("{accountId}/[action]")]
-        public async Task<ActionResult<CustomResponse<AccountActivityDTO>>> Deposit(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
-        {
-            return CreateActionResultInstance(_accountActivityService.Deposit(accountId, accountActivityCreateDTO));
+            return CreateActionResultInstance( await _accountActivityService.CreateAsync(accountId, accountActivityCreateDTO));
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using FinTech.Core.DTOs;
 using FinTech.Core.Entities;
 using FinTech.Core.Enums;
 using FinTech.Core.Interfaces;
 using FinTech.Service.Interfaces;
-using FinTech.Shared.Models;
+using FinTech.Core.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -13,6 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using FinTech.Core.DTOs.AccountActivity;
+using FinTech.Core.Constans;
+using System.Reflection.Metadata;
 
 namespace FinTech.Service.Services
 {
@@ -27,68 +29,51 @@ namespace FinTech.Service.Services
             _mapper = mapper;
         }
 
-        public CustomResponse< AccountActivityDTO> Deposit(Guid accountId ,AccountActivityCreateDTO accountActivityCreateDTO)
+        public async Task<CustomResponse<AccountActivityDTO>> CreateAsync(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
         {
-                Account account = _unitOfWork.AccountRepository.GetById(accountId);
-                if (account == null)
-                    return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, "Account Not Found");
-            _semaphoreSlim.WaitAsync();
+            Account account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId);
+            if (account == null)
+                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound );
+            if (accountActivityCreateDTO.TransactionType == TransactionType.Withdrawal && accountActivityCreateDTO.Amount >(await GetBalanceAsync(accountId)) )
+                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InsufficientFunds);
+            await _semaphoreSlim.WaitAsync();
             try
             {
-                _unitOfWork.BeginTransactionAsync();
-                account.Balance += accountActivityCreateDTO.Amount;
                 AccountActivity accountActivity = _mapper.Map<AccountActivity>(accountActivityCreateDTO);
-                accountActivity.TransactionType = TransactionType.Deposit;
                 accountActivity.Date = DateTime.UtcNow;
                 accountActivity.AccountId = account.Id;
-                _unitOfWork.AccountActivityRepository.Add(accountActivity);
-                _unitOfWork.SaveChanges();
                 AccountActivityDTO accountActivityDTO = _mapper.Map<AccountActivityDTO>(accountActivity);
-                _unitOfWork.CommitAsync();
-                return CustomResponse<AccountActivityDTO>.Success(StatusCodes.Status200OK, accountActivityDTO);
+                await _unitOfWork.AccountActivityRepository.AddAsync(accountActivity);
+                await _unitOfWork.SaveChangesAsync();
+                return CustomResponse<AccountActivityDTO>.Success(StatusCodes.Status201Created, accountActivityDTO);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _unitOfWork.RollbackAsync();
-                throw;
+                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
             }
             finally
             {
-                _semaphoreSlim.Release();
+                  _semaphoreSlim.Release();
             }
         }
-
-        public CustomResponse< AccountActivityDTO> Withdrawal(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
+        private async Task<decimal> GetBalanceAsync(Guid accountId)
         {
-                Account account = _unitOfWork.AccountRepository.GetById(accountId);
-                if (account == null)
-                    return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, "Account Not Found");
-                if (account.Balance < accountActivityCreateDTO.Amount)
-                    return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status400BadRequest, "Insufficient funds");
-            _semaphoreSlim.WaitAsync();
-            try
+            var accountActivities = await _unitOfWork.AccountActivityRepository.GetAllByAccountIdAsync(accountId);
+            decimal totalBalance = 0;
+
+            foreach (var activity in accountActivities)
             {
-                _unitOfWork.BeginTransactionAsync();
-                account.Balance = account.Balance -  accountActivityCreateDTO.Amount;
-                AccountActivity accountActivity = _mapper.Map<AccountActivity>(accountActivityCreateDTO);
-                accountActivity.TransactionType = TransactionType.Withdrawal;
-                accountActivity.Date = DateTime.UtcNow;
-                accountActivity.AccountId = account.Id;
-                _unitOfWork.AccountActivityRepository.Add(accountActivity);
-                _unitOfWork.SaveChanges();
-                AccountActivityDTO accountActivityDTO = _mapper.Map<AccountActivityDTO>(accountActivity);
-                _unitOfWork.CommitAsync();
-                return CustomResponse<AccountActivityDTO>.Success(StatusCodes.Status200OK, accountActivityDTO);
+                if (activity.TransactionType == TransactionType.Deposit)
+                {
+                    totalBalance += activity.Amount;
+                }
+                else if (activity.TransactionType == TransactionType.Withdrawal)
+                {
+                    totalBalance -= activity.Amount;
+                }
             }
-            catch (Exception)
-            {
-                _unitOfWork.RollbackAsync();
-                throw;
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
-            }
+
+            return totalBalance;
         }
     }
 }

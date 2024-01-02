@@ -9,6 +9,7 @@ namespace FinTech.Core.Interfaces
 {
     public interface IAccountActivityRepository
     {
-        public void Add(AccountActivity accountActivity);
+        Task AddAsync(AccountActivity accountActivity);
+        Task<List<AccountActivity>> GetAllByAccountIdAsync(Guid accountId);
     }
 }

@@ -19,13 +19,13 @@ namespace FinTech.Infrastructure.Repositories
             _dbSet = finTechDbContext.Set<MoneyTransfer>();
         }
 
-        public void Add(MoneyTransfer moneyTransfer)
+        public async Task AddAsync(MoneyTransfer moneyTransfer)
         {
-            _dbSet.Add(moneyTransfer);
+           await _dbSet.AddAsync(moneyTransfer);
         }
-        public List<decimal> GetDailyTransferAmount(Guid senderAccountId , DateTime date)
+        public async Task<List<decimal>> GetDailyTransferAmountAsync(Guid senderAccountId , DateTime date)
         {
-            List<decimal> amounts = _dbSet.Where(x => x.SenderAccountId == senderAccountId && x.Date.Date == date.Date).Select(x=>x.Amount).ToList();
+            List<decimal> amounts = await _dbSet.Where(x => x.SenderAccountId == senderAccountId && x.Date.Date == date.Date).Select(x=>x.Amount).ToListAsync();
             return amounts;
         }
     }

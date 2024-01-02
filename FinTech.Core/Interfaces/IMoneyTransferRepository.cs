@@ -9,7 +9,7 @@ namespace FinTech.Core.Interfaces
 {
     public interface IMoneyTransferRepository
     {
-        void Add(MoneyTransfer moneyTransfer);
-        List<decimal> GetDailyTransferAmount(Guid senderAccountId, DateTime date);
+        Task AddAsync(MoneyTransfer moneyTransfer);
+        Task<List<decimal>> GetDailyTransferAmountAsync(Guid senderAccountId, DateTime date);
     }
 }

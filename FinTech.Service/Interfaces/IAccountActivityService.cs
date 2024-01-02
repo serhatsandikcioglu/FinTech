@@ -1,5 +1,5 @@
-﻿using FinTech.Core.DTOs;
-using FinTech.Shared.Models;
+﻿using FinTech.Core.DTOs.AccountActivity;
+using FinTech.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,6 @@ namespace FinTech.Service.Interfaces
 {
     public interface IAccountActivityService
     {
-        CustomResponse<AccountActivityDTO> Deposit(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO);
-        CustomResponse<AccountActivityDTO> Withdrawal(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO);
+        Task<CustomResponse<AccountActivityDTO>> CreateAsync(Guid accountId , AccountActivityCreateDTO accountActivityCreateDTO);
     }
 }

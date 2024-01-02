@@ -20,30 +20,30 @@ namespace FinTech.Infrastructure.Repositories
             _dbSet = finTechDbContext.Set<Account>();
         }
 
-        public void Add(Account account)
+        public async Task AddAsync(Account account)
         {
-            _dbSet.Add(account);
+           await _dbSet.AddAsync(account);
         }
-        public string GetBiggestAccountNumber()
+        public async Task<string> GetBiggestAccountNumberAsync()
         {
-            var biggestAccount = _dbSet.OrderByDescending(x => x.Number).FirstOrDefault();
-            return biggestAccount?.Number;
+            var biggestAccount = await _dbSet.OrderByDescending(x => x.Number).FirstOrDefaultAsync();
+            return  biggestAccount?.Number;
         }
-        public decimal GetBalanceByAccountId(Guid accountId)
+        public async Task<bool> AccountIsExistAsync(Guid accountId)
         {
-            return _dbSet.Where(x=>x.Id == accountId).Select(x => x.Balance).FirstOrDefault();
+            return await _dbSet.AnyAsync(x => x.Id == accountId);
         }
-        public bool AccountIsExist(Guid accountId)
+        public async Task< Account> GetByIdAsync(Guid accountId)
         {
-            return _dbSet.Any(x => x.Id == accountId);
+            return await _dbSet.Where(x => x.Id == accountId).FirstOrDefaultAsync();
         }
-        public Account GetById(Guid accountId)
+        public async Task<Account> GetByAccountNumberAsync(string accountNumber)
         {
-            return _dbSet.Where(x => x.Id == accountId).FirstOrDefault();
+            return await _dbSet.Where(x => x.Number == accountNumber).FirstOrDefaultAsync();
         }
-        public Account GetByAccountNumber(string accountNumber)
+        public async Task<bool> AccountIsExistByAccountNumberAsync(string accountNumber)
         {
-            return _dbSet.Where(x => x.Number == accountNumber).FirstOrDefault();
+            return await _dbSet.AnyAsync(x => x.Number == accountNumber);
         }
     }
 }

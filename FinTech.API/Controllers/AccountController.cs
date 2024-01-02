@@ -1,10 +1,13 @@
-﻿using FinTech.Core.DTOs;
-using FinTech.Core.Entities;
+﻿using FinTech.Core.Entities;
 using FinTech.Service.Interfaces;
-using FinTech.Shared.Models;
+using FinTech.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using FinTech.Core.DTOs.Account;
+using FinTech.Core.DTOs.Balance;
 
 namespace FinTech.API.Controllers
 {
@@ -19,19 +22,26 @@ namespace FinTech.API.Controllers
             _accountService = accountService;
         }
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "customer")]
         public async Task<ActionResult<CustomResponse<AccountDTO>>> Create(AccountCreateDTO accountCreateDTO)
         {
-            return CreateActionResultInstance(_accountService.Create(accountCreateDTO));
+            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return CreateActionResultInstance(await _accountService.CreateAccountAccordingRulesAsync(userId, accountCreateDTO));
         }
         [HttpGet("{accountId}/balance")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "customer")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> GetBalance(Guid accountId)
         {
-            return CreateActionResultInstance(_accountService.GetBalanceByAccountId(accountId));
+            return CreateActionResultInstance( await _accountService.GetBalanceByAccountIdAsync(accountId));
         }
         [HttpPut("{accountId}/balance")]
-        public async Task<ActionResult<CustomResponse<NoContent>>> UpdateBalance(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "admin")]
+        public async Task<ActionResult<CustomResponse<BalanceDTO>>> UpdateBalance(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
         {
-            return CreateActionResultInstance(_accountService.Update(accountId,balanceUpdateDTO));
+            return CreateActionResultInstance( await _accountService.UpdateBalanceAsync(accountId,balanceUpdateDTO));
         }
     }
 }
