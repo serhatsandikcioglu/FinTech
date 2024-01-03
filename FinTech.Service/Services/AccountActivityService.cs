@@ -34,14 +34,17 @@ namespace FinTech.Service.Services
             Account account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId);
             if (account == null)
                 return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound );
+
             if (accountActivityCreateDTO.TransactionType == TransactionType.Withdrawal && accountActivityCreateDTO.Amount >(await GetBalanceAsync(accountId)) )
                 return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InsufficientFunds);
+
             await _semaphoreSlim.WaitAsync();
             try
             {
                 AccountActivity accountActivity = _mapper.Map<AccountActivity>(accountActivityCreateDTO);
                 accountActivity.Date = DateTime.UtcNow;
                 accountActivity.AccountId = account.Id;
+
                 AccountActivityDTO accountActivityDTO = _mapper.Map<AccountActivityDTO>(accountActivity);
                 await _unitOfWork.AccountActivityRepository.AddAsync(accountActivity);
                 await _unitOfWork.SaveChangesAsync();

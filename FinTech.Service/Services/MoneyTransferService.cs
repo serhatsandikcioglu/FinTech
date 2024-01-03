@@ -63,9 +63,12 @@ namespace FinTech.Service.Services
             Account receiverAccount = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(externalTransferCreateDTO.ReceiverAccountNumber);
             if (receiverAccount == null)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
+
             var receiverUser = receiverAccount.ApplicationUser;
+
             if (externalTransferCreateDTO.Name != receiverUser.Name || externalTransferCreateDTO.Surname != receiverUser.Surname)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.NameAndSurnameDontMatch);
+
             MoneyTransfer moneyTransfer = _mapper.Map<MoneyTransfer>(externalTransferCreateDTO);
             moneyTransfer.ReceiverAccountId = receiverAccount.Id;
             return await PerformTransferAsync(moneyTransfer);
@@ -76,15 +79,19 @@ namespace FinTech.Service.Services
             MoneyTransfer moneyTransfer = _mapper.Map<MoneyTransfer>(internalTransferCreateDTO);
             return await PerformTransferAsync(moneyTransfer);
         }
+
         private async Task<(bool IsWithinLimit , decimal RemainingLimit)> CalculateDailyTransferLimitAsync(Guid accountId , decimal amount)
         {
           var amountsSent = await  _unitOfWork.MoneyTransferRepository.GetDailyTransferAmountAsync(accountId,DateTime.UtcNow.Date);
+
             var totalAmountSent = amountsSent.Sum();
             decimal remainingLimit = MoneyTransferConstants.DailyTransferLimit - totalAmountSent;
+
             if (totalAmountSent + amount <= MoneyTransferConstants.DailyTransferLimit)
             {
                 return (true,remainingLimit);
             }
+
             return (false,remainingLimit);
         }
         private async Task AccountActivityCreateProcess(Guid accountId, TransactionType transactionType, decimal amount)

@@ -43,11 +43,18 @@ namespace FinTech.Service.Services
                 await _unitOfWork.BeginTransactionAsync();
                 ApplicationUser appUser = _mapper.Map<ApplicationUser>(UserCreateDTO);
                 appUser.UserName = UserCreateDTO.IdentityNumber;
+
                 var result = await _userManager.CreateAsync(appUser, UserCreateDTO.Password);
+
+                if (!result.Succeeded)
+                    return CustomResponse<UserDTO>.Fail(StatusCodes.Status500InternalServerError, result.Errors.Select(x => x.Description).ToList());
+
                 await _userManager.AddToRoleAsync(appUser, RoleConstants.Customer);
+
                 AccountCreateDTO accountCreateDTO = new AccountCreateDTO();
                 await _accountService.CreateAccountWithoutRulesAsync(appUser.Id, accountCreateDTO);
                 var userDTO = _mapper.Map<UserDTO>(appUser);
+
                 await _unitOfWork.CommitAsync();
                 return CustomResponse<UserDTO>.Success(StatusCodes.Status201Created, userDTO);
             }
@@ -78,6 +85,7 @@ namespace FinTech.Service.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.UserNotFound);
+
             var roleExists = await _roleManager.RoleExistsAsync(roleDTO.Role);
             if (!roleExists)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.RoleNotFound);
@@ -116,6 +124,7 @@ namespace FinTech.Service.Services
         public async Task<CustomResponse<UserRolesDTO>> GetRoles(Guid userIdGuid)
         {
             string userId = userIdGuid.ToString();
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return CustomResponse<UserRolesDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.UserNotFound);
@@ -123,6 +132,7 @@ namespace FinTech.Service.Services
             var roles = await _userManager.GetRolesAsync(user);
             UserRolesDTO userRolesDTO = new UserRolesDTO();
             userRolesDTO.Roles = roles.ToList();
+
             return CustomResponse<UserRolesDTO>.Success(StatusCodes.Status200OK, userRolesDTO);
         }
     }

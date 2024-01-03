@@ -33,9 +33,12 @@ namespace FinTech.Service.Services
             {
                 var incomeRatio = Math.Min(1, monthlyIncome / LoanApplicationConstants.MaxIncome);
                 var paymentStatus = await _unitOfWork.LoanApplicationRepository.GetPaymentStatusesByUserIdAsync(applicationUserId);
+
                 var delayedPaymentCount = paymentStatus.Count(x => x == Core.Enums.PaymentStatus.DelayedPayment);
                 var loanRepaymentHabitsRatio = (paymentStatus.Count == 0) ? 0 : 1 - (delayedPaymentCount / paymentStatus.Count);
+
                 var creditScore = ((incomeRatio * 0.35m) + (loanRepaymentHabitsRatio * 0.65m)) * 1900;
+
                 if (creditScore >= 1700)
                 {
                     return "Very Good";
@@ -71,6 +74,7 @@ namespace FinTech.Service.Services
             loanApplication.Date = DateTime.UtcNow;
             loanApplication.ApplicationUserId = applicationUserId;
             loanApplication.CreditScoreResultComment = await CalculateCreditScoreAsync(applicationUserId, loanApplicationCreateDTO.MonthlyIncome);
+
             LoanApplicationDTO loanApplicationDTO = _mapper.Map<LoanApplicationDTO>(loanApplication);
             await _unitOfWork.LoanApplicationRepository.AddAsync(loanApplication);
             await _unitOfWork.SaveChangesAsync();
@@ -83,11 +87,13 @@ namespace FinTech.Service.Services
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.LoanApplicationNotFound);
             if (loanApplication.Status != Core.Enums.LoanApllicationStatus.Pending)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.LoanApplicationProcessed);
+
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
                 loanApplication.Status = loanApplicationEvaluationDTO.LoanApllicationStatus;
                 await _unitOfWork.SaveChangesAsync();
+
                 if (loanApplication.Status == Core.Enums.LoanApllicationStatus.Approved)
                 {
                     await CreateRepaymentPlanAsync(loanApplicationId, loanApplication.Amount, loanApplication.MaturityTerm);
@@ -108,6 +114,7 @@ namespace FinTech.Service.Services
             {
                 var InterestFactor = Math.Pow(1 + LoanApplicationConstants.MonthlyInterestRate, maturityTerm);
                 var MonthlyPayment = (((decimal)InterestFactor * (decimal)LoanApplicationConstants.MonthlyInterestRate) / ((decimal)InterestFactor - 1)) * amount;
+
                 for (int i = 1; i <= maturityTerm; i++)
                 {
                     RepaymentPlan repaymentPlan = new RepaymentPlan
@@ -120,6 +127,7 @@ namespace FinTech.Service.Services
                     };
                     await _unitOfWork.RepaymentPlanRepository.AddAsync(repaymentPlan);
                 }
+
                 await _unitOfWork.SaveChangesAsync();
                 return CustomResponse<NoContent>.Success(StatusCodes.Status201Created);
             }
@@ -132,8 +140,10 @@ namespace FinTech.Service.Services
         public async Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserId(Guid userId)
         {
            List<LoanApplication> loanApplications =  await _unitOfWork.LoanApplicationRepository.GetAllByUserIdAsync(userId);
+
             if (loanApplications == null)
                 return CustomResponse<List<LoanApplicationDTO>>.Fail(StatusCodes.Status404NotFound,ErrorMessageConstants.LoanApplicationNotFound);
+
             List<LoanApplicationDTO> loanApplicationDTOs = _mapper.Map<List<LoanApplicationDTO>>(loanApplications);
             return CustomResponse<List<LoanApplicationDTO>>.Success(StatusCodes.Status200OK,loanApplicationDTOs);
         }

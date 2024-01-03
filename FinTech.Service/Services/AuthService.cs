@@ -34,6 +34,7 @@ namespace FinTech.Service.Services
                 return CustomResponse<TokenDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.IncorrectUsernameOrPassword);
             if (!await _userManager.CheckPasswordAsync(user, loginDTO.Password))
                 return CustomResponse<TokenDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.IncorrectUsernameOrPassword);
+
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var claims = new List<Claim>();
@@ -43,12 +44,14 @@ namespace FinTech.Service.Services
             {
                 claims.Add(new Claim(ClaimTypes.Role, x));
             });
+
             var token = GenerateToken(claims);
             TokenDTO tokenDTO = new TokenDTO
             {
                 Token = token,
                 UserId = user.Id.ToString()
             };
+
             return CustomResponse<TokenDTO>.Success(StatusCodes.Status200OK, tokenDTO);
         }
         private string GenerateToken(IEnumerable<Claim> claims)
@@ -56,6 +59,7 @@ namespace FinTech.Service.Services
             var audience = _customTokenOption.Audience[0];
             var accessTokenExpiration = DateTime.UtcNow.AddMinutes(_customTokenOption.AccessTokenExpiration);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_customTokenOption.SecurityKey));
+
             var tokenDesc = new SecurityTokenDescriptor
             {
                 SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256),
@@ -64,6 +68,7 @@ namespace FinTech.Service.Services
                 Issuer = _customTokenOption.Issuer,
                 Audience = audience
             };
+
             var handler = new JwtSecurityTokenHandler();
             var token = handler.CreateToken(tokenDesc);
             return handler.WriteToken(token);

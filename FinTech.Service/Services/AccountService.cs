@@ -40,12 +40,16 @@ namespace FinTech.Service.Services
         {
             if (accountCreateDTO.Balance < AccountConstants.MinimumInitialBalance)
                 return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InitialBalanceError);
+
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
+
                 var accountResponse = await CreateAccountWithoutRulesAsync(applicationUserId, accountCreateDTO);
+
                 await AccountActivityCreateProcess(accountCreateDTO.SenderAccountId,TransactionType.Withdrawal,accountCreateDTO.Balance);
                 await AccountActivityCreateProcess(accountResponse.Data.Id, TransactionType.Deposit, accountCreateDTO.Balance);
+
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
                 return CustomResponse<AccountDTO>.Success(StatusCodes.Status201Created, accountResponse.Data);
@@ -56,6 +60,7 @@ namespace FinTech.Service.Services
                 return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
         }
+
         public async Task<CustomResponse<AccountDTO>> CreateAccountWithoutRulesAsync(Guid applicationUserId, AccountCreateDTO accountCreateDTO)
         {
             try
@@ -63,6 +68,7 @@ namespace FinTech.Service.Services
                 Account account = _mapper.Map<Account>(accountCreateDTO);
                 account.ApplicationUserId = applicationUserId;
                 account.Number = await CreateAccountNumberAsync();
+
                 await _unitOfWork.AccountRepository.AddAsync(account);
                 AccountDTO accountDTO = _mapper.Map<AccountDTO>(account);
                 await _unitOfWork.SaveChangesAsync();
@@ -74,6 +80,7 @@ namespace FinTech.Service.Services
             }
                 
         }
+
         private async Task<string> CreateAccountNumberAsync()
         {
             int maxAccountNumberLength = 6;
@@ -129,6 +136,7 @@ namespace FinTech.Service.Services
                 return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
             if (balanceUpdateDTO.Balance < 0)
                 return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.MinBalanceError);
+
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
