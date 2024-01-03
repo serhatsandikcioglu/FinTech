@@ -36,7 +36,7 @@ namespace FinTech.API.Controllers
         {
             return CreateActionResultInstance( await _accountService.GetBalanceByAccountIdAsync(accountId));
         }
-        [HttpPut("{accountId}/balance")]
+        [HttpPost("{accountId}/balance")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Roles = "admin")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> UpdateBalance(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)

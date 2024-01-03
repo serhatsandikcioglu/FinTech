@@ -65,6 +65,10 @@ namespace FinTech.Service.Services
                 ApplicationUser appUser = _mapper.Map<ApplicationUser>(UserCreateDTO);
                 appUser.UserName = UserCreateDTO.IdentityNumber;
                 var result = await _userManager.CreateAsync(appUser, UserCreateDTO.Password);
+
+            if (!result.Succeeded)
+                return CustomResponse<UserDTO>.Fail(StatusCodes.Status500InternalServerError, result.Errors.Select(x => x.Description).ToList());
+
                 var userDTO = _mapper.Map<UserDTO>(appUser);
                 return CustomResponse<UserDTO>.Success(StatusCodes.Status201Created, userDTO);
         }

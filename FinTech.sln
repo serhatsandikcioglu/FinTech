@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinTech.Service", "FinTech.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinTech.Infrastructure", "FinTech.Infrastructure\FinTech.Infrastructure.csproj", "{793BB847-8AB6-40DB-A889-AA0CDCF5E3B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinTech.Shared", "FinTech.Shared\FinTech.Shared.csproj", "{A61F1258-FDF4-4D6C-A2F2-D7D7746BC3EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinTech.Shared", "FinTech.Shared\FinTech.Shared.csproj", "{A61F1258-FDF4-4D6C-A2F2-D7D7746BC3EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinTech.AutomaticPayment", "FinTech.AutomaticPayment\FinTech.AutomaticPayment.csproj", "{909F76DA-EDEA-4C31-A762-D3431917197F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{A61F1258-FDF4-4D6C-A2F2-D7D7746BC3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A61F1258-FDF4-4D6C-A2F2-D7D7746BC3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A61F1258-FDF4-4D6C-A2F2-D7D7746BC3EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{909F76DA-EDEA-4C31-A762-D3431917197F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{909F76DA-EDEA-4C31-A762-D3431917197F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{909F76DA-EDEA-4C31-A762-D3431917197F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{909F76DA-EDEA-4C31-A762-D3431917197F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

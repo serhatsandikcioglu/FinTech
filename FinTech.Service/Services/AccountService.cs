@@ -64,8 +64,8 @@ namespace FinTech.Service.Services
                 account.ApplicationUserId = applicationUserId;
                 account.Number = await CreateAccountNumberAsync();
                 await _unitOfWork.AccountRepository.AddAsync(account);
-                await _unitOfWork.SaveChangesAsync();
                 AccountDTO accountDTO = _mapper.Map<AccountDTO>(account);
+                await _unitOfWork.SaveChangesAsync();
                 return CustomResponse<AccountDTO>.Success(StatusCodes.Status201Created, accountDTO);
             }
             catch (Exception ex)

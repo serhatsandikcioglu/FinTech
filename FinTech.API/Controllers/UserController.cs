@@ -21,8 +21,6 @@ namespace FinTech.API.Controllers
             _userService = userService;
         }
         [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = RoleConstants.CustomerSupport)]
         public async Task<ActionResult<CustomResponse<UserDTO>>> CreateCustomer(UserCreateDTO userCreateDTO)
         {
             return CreateActionResultInstance(await _userService.CreateCustomer(userCreateDTO));
