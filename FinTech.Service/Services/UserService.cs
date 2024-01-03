@@ -54,7 +54,7 @@ namespace FinTech.Service.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
-                return CustomResponse<UserDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+                return CustomResponse<UserDTO>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
         }
         public async Task<CustomResponse<UserDTO>> CreateUser(UserCreateDTO UserCreateDTO)

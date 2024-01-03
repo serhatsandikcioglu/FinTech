@@ -49,7 +49,7 @@ namespace FinTech.Service.Services
             }
             catch (Exception ex)
             {
-                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
             finally
             {

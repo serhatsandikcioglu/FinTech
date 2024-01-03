@@ -11,6 +11,7 @@ namespace FinTech.Service.Interfaces
 {
     public interface IMoneyTransferService
     {
-        Task<CustomResponse<NoContent>> CreateAsync(MoneyTransferCreateDTO moneyTransferCreateDTO);
+        Task<CustomResponse<NoContent>> InternalTransfer(InternalTransferCreateDTO internalTransferCreateDTO);
+        Task<CustomResponse<NoContent>> ExternalTransfer(ExternalTransferCreateDTO externalTransferCreateDTO);
     }
 }

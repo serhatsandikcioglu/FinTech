@@ -25,7 +25,8 @@ namespace FinTech.Core.Mapper
             CreateMap<AccountActivity,AccountActivityDTO>().ReverseMap();
             CreateMap<AccountActivity,AccountActivityCreateDTO>().ReverseMap();
 
-            CreateMap<MoneyTransfer,MoneyTransferCreateDTO>().ReverseMap();
+            CreateMap<MoneyTransfer,InternalTransferCreateDTO>().ReverseMap();
+            CreateMap<MoneyTransfer,ExternalTransferCreateDTO>().ReverseMap();
 
             CreateMap<LoanApplication, LoanApplicationCreateDTO>().ReverseMap();
             CreateMap<LoanApplication, LoanApplicationDTO>().ReverseMap();

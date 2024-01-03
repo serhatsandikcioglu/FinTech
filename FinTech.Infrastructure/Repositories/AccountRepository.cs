@@ -39,7 +39,7 @@ namespace FinTech.Infrastructure.Repositories
         }
         public async Task<Account> GetByAccountNumberAsync(string accountNumber)
         {
-            return await _dbSet.Where(x => x.Number == accountNumber).FirstOrDefaultAsync();
+            return await _dbSet.Where(x => x.Number == accountNumber).Include(x=>x.ApplicationUser).FirstOrDefaultAsync();
         }
         public async Task<bool> AccountIsExistByAccountNumberAsync(string accountNumber)
         {

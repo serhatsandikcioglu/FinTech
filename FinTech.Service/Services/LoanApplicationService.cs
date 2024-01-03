@@ -98,7 +98,7 @@ namespace FinTech.Service.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
-                return CustomResponse<NoContent>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
 
         }

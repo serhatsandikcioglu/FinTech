@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.DTOs.MoneyTransfer
 {
-    public class MoneyTransferCreateDTO
+    public class InternalTransferCreateDTO
     {
         public Guid SenderAccountId { get; set; }
-        public string ReceiverAccountNumber { get; set; }
+        public Guid ReceiverAccountId { get; set; }
         public decimal Amount { get; set; }
     }
 }

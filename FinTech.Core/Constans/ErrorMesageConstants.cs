@@ -23,6 +23,7 @@ namespace FinTech.Core.Constans
         public const string RoleNotFound = "Role Not Found";
         public const string SupportTicketNotFound = "Support Ticket Not Found";
         public const string SupportTicketPrioritized = "Support Ticket Prioritized Already";
+        public const string NameAndSurnameDontMatch = "Name And Surname Dont Match";
 
     }
 }

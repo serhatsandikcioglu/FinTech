@@ -53,7 +53,7 @@ namespace FinTech.Service.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
-                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
         }
         public async Task<CustomResponse<AccountDTO>> CreateAccountWithoutRulesAsync(Guid applicationUserId, AccountCreateDTO accountCreateDTO)
@@ -70,7 +70,7 @@ namespace FinTech.Service.Services
             }
             catch (Exception ex)
             {
-                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
                 
         }
@@ -150,7 +150,7 @@ namespace FinTech.Service.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
-                return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+                return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
         }
 

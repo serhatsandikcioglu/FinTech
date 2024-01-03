@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace FinTech.API.Controllers
 {
-    [Route("api/moneyTransfers")]
+    [Route("api/moneyTransfers/[action]")]
     [ApiController]
     public class MoneyTransferController : CustomBaseController
     {
@@ -21,9 +21,16 @@ namespace FinTech.API.Controllers
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Roles = "customer")]
-        public async Task<ActionResult<CustomResponse<NoContent>>> Create(MoneyTransferCreateDTO moneyTransferCreateDTO)
+        public async Task<ActionResult<CustomResponse<NoContent>>> ExternalTransfer(ExternalTransferCreateDTO externalTransferCreateDTO)
         {
-            return CreateActionResultInstance( await _moneyTransferService.CreateAsync(moneyTransferCreateDTO));
+            return CreateActionResultInstance( await _moneyTransferService.ExternalTransfer(externalTransferCreateDTO));
+        }
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "customer")]
+        public async Task<ActionResult<CustomResponse<NoContent>>> InternalTransfer(InternalTransferCreateDTO internalTransferCreateDTO)
+        {
+            return CreateActionResultInstance(await _moneyTransferService.InternalTransfer(internalTransferCreateDTO));
         }
     }
 }

@@ -30,40 +30,62 @@ namespace FinTech.Service.Services
             _mapper = mapper;
             _accountActivityService = accountActivityService;
         }
-        public async Task<CustomResponse<NoContent>> CreateAsync(MoneyTransferCreateDTO moneyTransferCreateDTO)
+        private async Task<CustomResponse<NoContent>> PerformTransferAsync(MoneyTransfer moneyTransfer)
         {
-            var chechResult = await PerformMoneyTransferChecksAsync(moneyTransferCreateDTO);
-            if (!chechResult.Succeeded)
-                return chechResult;
+            var checkResult = await PerformMoneyTransferChecksAsync(moneyTransfer.ReceiverAccountId, moneyTransfer.SenderAccountId, moneyTransfer.Amount);
+            if (!checkResult.Succeeded)
+                return checkResult;
+
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                await AccountActivityCreateProcess(moneyTransferCreateDTO.SenderAccountId, TransactionType.Withdrawal, moneyTransferCreateDTO.Amount);
-                Guid receiverAccountId = (await _unitOfWork.AccountRepository.GetByAccountNumberAsync(moneyTransferCreateDTO.ReceiverAccountNumber)).Id;
-                await AccountActivityCreateProcess(receiverAccountId, TransactionType.Deposit, moneyTransferCreateDTO.Amount);
-                MoneyTransfer moneyTransfer = _mapper.Map<MoneyTransfer>(moneyTransferCreateDTO);
-                moneyTransfer.ReceiverAccountId = receiverAccountId;
+
+                await AccountActivityCreateProcess(moneyTransfer.SenderAccountId, TransactionType.Withdrawal, moneyTransfer.Amount);
+                await AccountActivityCreateProcess(moneyTransfer.ReceiverAccountId, TransactionType.Deposit, moneyTransfer.Amount);
+
                 moneyTransfer.Date = DateTime.UtcNow;
+
                 await _unitOfWork.MoneyTransferRepository.AddAsync(moneyTransfer);
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
+
                 return CustomResponse<NoContent>.Success(StatusCodes.Status201Created);
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
-                return CustomResponse<NoContent>.Fail(StatusCodes.Status500InternalServerError, new List<string> { ex.Message });
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
         }
-        private async Task<bool> CalculateDailyTransferLimitAsync(Guid accountId , decimal amount)
+
+        public async Task<CustomResponse<NoContent>> ExternalTransfer(ExternalTransferCreateDTO externalTransferCreateDTO)
+        {
+            Account receiverAccount = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(externalTransferCreateDTO.ReceiverAccountNumber);
+            if (receiverAccount == null)
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
+            var receiverUser = receiverAccount.ApplicationUser;
+            if (externalTransferCreateDTO.Name != receiverUser.Name || externalTransferCreateDTO.Surname != receiverUser.Surname)
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.NameAndSurnameDontMatch);
+            MoneyTransfer moneyTransfer = _mapper.Map<MoneyTransfer>(externalTransferCreateDTO);
+            moneyTransfer.ReceiverAccountId = receiverAccount.Id;
+            return await PerformTransferAsync(moneyTransfer);
+        }
+
+        public async Task<CustomResponse<NoContent>> InternalTransfer(InternalTransferCreateDTO internalTransferCreateDTO)
+        {
+            MoneyTransfer moneyTransfer = _mapper.Map<MoneyTransfer>(internalTransferCreateDTO);
+            return await PerformTransferAsync(moneyTransfer);
+        }
+        private async Task<(bool IsWithinLimit , decimal RemainingLimit)> CalculateDailyTransferLimitAsync(Guid accountId , decimal amount)
         {
           var amountsSent = await  _unitOfWork.MoneyTransferRepository.GetDailyTransferAmountAsync(accountId,DateTime.UtcNow.Date);
             var totalAmountSent = amountsSent.Sum();
+            decimal remainingLimit = MoneyTransferConstants.DailyTransferLimit - totalAmountSent;
             if (totalAmountSent + amount <= MoneyTransferConstants.DailyTransferLimit)
             {
-                return true;
+                return (true,remainingLimit);
             }
-            return false;
+            return (false,remainingLimit);
         }
         private async Task AccountActivityCreateProcess(Guid accountId, TransactionType transactionType, decimal amount)
         {
@@ -80,16 +102,18 @@ namespace FinTech.Service.Services
                 throw new Exception(processResponse.Error.Details[0].ToString());
             }
         }
-        private async Task<CustomResponse<NoContent>> PerformMoneyTransferChecksAsync(MoneyTransferCreateDTO moneyTransferCreateDTO)
+        private async Task<CustomResponse<NoContent>> PerformMoneyTransferChecksAsync(Guid receiverAccountId , Guid senderAccountId, decimal amount)
         {
-            if (!await _unitOfWork.AccountRepository.AccountIsExistByAccountNumberAsync(moneyTransferCreateDTO.ReceiverAccountNumber))
+            if (!await _unitOfWork.AccountRepository.AccountIsExistAsync(receiverAccountId) || !await _unitOfWork.AccountRepository.AccountIsExistAsync(senderAccountId))
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.AccountNotFound);
 
-            if (moneyTransferCreateDTO.Amount > MoneyTransferConstants.PerTransactionTransferLimit)
+            if (amount > MoneyTransferConstants.PerTransactionTransferLimit)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.TransferLimitError);
 
-            if (!await CalculateDailyTransferLimitAsync(moneyTransferCreateDTO.SenderAccountId, moneyTransferCreateDTO.Amount))
-                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.DailyTransferLimitError);
+            var (isWithinLimit, remainingLimit) = await CalculateDailyTransferLimitAsync(senderAccountId, amount);
+
+            if (!isWithinLimit)
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, $"{ErrorMessageConstants.DailyTransferLimitError}. Remaining limit: {remainingLimit}");
 
             return CustomResponse<NoContent>.Success(StatusCodes.Status200OK);
         }
