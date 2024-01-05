@@ -25,7 +25,7 @@ namespace FinTech.Service.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<CustomResponse<SupportTicketCreatedDTO>> Create(Guid userId , SupportTicketCreateDTO supportTicketCreateDTO)
+        public async Task<CustomResponse<SupportTicketCreatedDTO>> CreateAsync(Guid userId , SupportTicketCreateDTO supportTicketCreateDTO)
         {
             SupportTicket supportTicket = _mapper.Map<SupportTicket>(supportTicketCreateDTO);
             supportTicket.ApplicationUserId = userId;
@@ -37,7 +37,7 @@ namespace FinTech.Service.Services
             SupportTicketCreatedDTO supportTicketCreatedDTO = _mapper.Map<SupportTicketCreatedDTO>(supportTicket);
             return CustomResponse<SupportTicketCreatedDTO>.Success(StatusCodes.Status201Created, supportTicketCreatedDTO);
         }
-        public async Task<CustomResponse<SupportTicketDTO>> GetByWithoutPrioritizationStatus()
+        public async Task<CustomResponse<SupportTicketDTO>> GetByWithoutPrioritizationStatusAsync()
         {
             SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetOldestUnprioritizedSupportRequest();
 
@@ -47,7 +47,7 @@ namespace FinTech.Service.Services
             SupportTicketDTO supportTicketDTO = _mapper.Map<SupportTicketDTO>(supportTicket);
             return CustomResponse<SupportTicketDTO>.Success(StatusCodes.Status200OK,supportTicketDTO);
         }
-        public async Task<CustomResponse<NoContent>> DeterminePriortyLevel(Guid supportTicketId, TicketPriorityLevel ticketPriorityLevel)
+        public async Task<CustomResponse<NoContent>> DeterminePriortyLevelAsync(Guid supportTicketId, TicketPriorityLevel ticketPriorityLevel)
         {
             SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetById(supportTicketId);
 
@@ -61,7 +61,7 @@ namespace FinTech.Service.Services
             await _unitOfWork.SaveChangesAsync();
             return CustomResponse<NoContent>.Success(StatusCodes.Status200OK);
         }
-        public async Task<CustomResponse<SupportTicketDTO>> GetByPriorityStatus()
+        public async Task<CustomResponse<SupportTicketDTO>> GetByPriorityStatusAsync()
         {
             SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetOldestPendingPrioritySupportRequest();
 
@@ -70,6 +70,21 @@ namespace FinTech.Service.Services
 
             SupportTicketDTO supportTicketDTO = _mapper.Map<SupportTicketDTO>(supportTicket);
             return CustomResponse<SupportTicketDTO>.Success(StatusCodes.Status200OK, supportTicketDTO);
+        }
+        public async Task<CustomResponse<NoContent>> ProcessAsync(Guid supportTicketId)
+        {
+            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetById(supportTicketId);
+
+            if (supportTicket == null)
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.SupportTicketNotFound);
+
+            if (supportTicket.Status != TicketStatus.Pending)
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.SupportTicketProcessed);
+
+            supportTicket.Status = TicketStatus.Processing;
+            await _unitOfWork.SaveChangesAsync();
+            return CustomResponse<NoContent>.Success(StatusCodes.Status200OK);
+
         }
     }
 }
