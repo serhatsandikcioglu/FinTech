@@ -20,15 +20,7 @@ namespace FinTech.Infrastructure.Repositories
             _dbSet = finTechDbContext.Set<SupportTicket>();
         }
 
-        public async Task AddAsync(SupportTicket supportTicket)
-        {
-            await _dbSet.AddAsync(supportTicket);
-        }
-        public async Task<SupportTicket> GetById(Guid id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
-        public async Task<SupportTicket> GetOldestUnprioritizedSupportRequest()
+        public async Task<SupportTicket> GetOldestUnprioritizedSupportRequestAsync()
         {
             var ticket = _dbSet
                 .Where(t => t.PriorityLevel == null)
@@ -37,7 +29,7 @@ namespace FinTech.Infrastructure.Repositories
 
             return ticket;
         }
-        public async Task<SupportTicket> GetOldestPendingPrioritySupportRequest()
+        public async Task<SupportTicket> GetOldestPendingPrioritySupportRequestAsync()
         {
             var ticket = _dbSet
                 .Where(ticket => ticket.Status == TicketStatus.Pending && ticket.PriorityLevel.HasValue)

@@ -11,10 +11,8 @@ namespace FinTech.Core.Interfaces
 {
     public interface IAccountRepository : IGenericRepository<Account>
     {
-        Task AddAsync(Account account);
         Task<string> GetBiggestAccountNumberAsync();
         Task<bool> AccountIsExistAsync(Guid accountId);
-        Task<Account> GetByIdAsync(Guid accountId);
         Task<Account> GetByAccountNumberAsync(string accountNumber);
         Task<bool> AccountIsExistByAccountNumberAsync(string accountNumber);
     }

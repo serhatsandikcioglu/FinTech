@@ -22,21 +22,28 @@ namespace FinTech.API.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer")]
+        [Authorize(Roles = "customer,admin")]
         public async Task<ActionResult<CustomResponse<LoanApplicationDTO>>> Create(LoanApplicationCreateDTO loanApplicationCreateDTO)
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return CreateActionResultInstance(await _loanApplicationService.CreateAsync(userId, loanApplicationCreateDTO));
         }
-        [HttpGet("GetAllByUser")]
+        [HttpGet("byUser")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer")]
-        public async Task<ActionResult<CustomResponse<LoanApplicationDTO>>> GetAllByUserId()
+        [Authorize(Roles = "customer,admin")]
+        public async Task<ActionResult<CustomResponse<List<LoanApplicationDTO>>>> GetAllByUserId()
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _loanApplicationService.GetAllByUserId(userId));
+            return CreateActionResultInstance(await _loanApplicationService.GetAllByUserIdAsync(userId));
         }
-        [HttpPut("{loanApplicationId}/evaluation")]
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "admin,loanOfficer")]
+        public async Task<ActionResult<CustomResponse<List<LoanApplicationDTO>>>> GetAll()
+        {
+            return CreateActionResultInstance(await _loanApplicationService.GetAllAsync());
+        }
+        [HttpPut("evaluation/{loanApplicationId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Roles = "admin,loanOfficer")]
         public async Task<ActionResult<CustomResponse<NoContent>>> LoanApplicationEvaluation(Guid loanApplicationId , LoanApplicationEvaluationDTO loanApplicationEvaluationDTO)

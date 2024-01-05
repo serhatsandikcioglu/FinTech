@@ -47,8 +47,8 @@ namespace FinTech.Service.Services
 
                 var accountResponse = await CreateAccountWithoutRulesAsync(applicationUserId, accountCreateDTO);
 
-                await AccountActivityCreateProcess(accountCreateDTO.SenderAccountId,TransactionType.Withdrawal,accountCreateDTO.Balance);
-                await AccountActivityCreateProcess(accountResponse.Data.Id, TransactionType.Deposit, accountCreateDTO.Balance);
+                await AccountActivityCreateProcessAsync(accountCreateDTO.SenderAccountId,TransactionType.Withdrawal,accountCreateDTO.Balance);
+                await AccountActivityCreateProcessAsync(accountResponse.Data.Id, TransactionType.Deposit, accountCreateDTO.Balance);
 
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
@@ -145,11 +145,11 @@ namespace FinTech.Service.Services
 
                 if (changeAmount > 0)
                 {
-                    await AccountActivityCreateProcess(accountId, TransactionType.Deposit, changeAmount);
+                    await AccountActivityCreateProcessAsync(accountId, TransactionType.Deposit, changeAmount);
                 }
                 else if (changeAmount < 0)
                 {
-                    await AccountActivityCreateProcess(accountId, TransactionType.Withdrawal, Math.Abs(changeAmount));
+                    await AccountActivityCreateProcessAsync(accountId, TransactionType.Withdrawal, Math.Abs(changeAmount));
                 }
                 BalanceDTO balanceDTO = _mapper.Map<BalanceDTO>(balanceUpdateDTO);
                 await _unitOfWork.CommitAsync();
@@ -162,7 +162,7 @@ namespace FinTech.Service.Services
             }
         }
 
-        private async Task AccountActivityCreateProcess(Guid accountId, TransactionType transactionType, decimal amount)
+        private async Task AccountActivityCreateProcessAsync(Guid accountId, TransactionType transactionType, decimal amount)
         {
             var accountActivityCreateDTO = new AccountActivityCreateDTO
             {

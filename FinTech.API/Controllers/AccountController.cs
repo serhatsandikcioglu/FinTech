@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using FinTech.Core.DTOs.Account;
 using FinTech.Core.DTOs.Balance;
+using FinTech.Core.Constans;
 
 namespace FinTech.API.Controllers
 {
     [Route("api/accounts")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class AccountController : CustomBaseController
     {
         private readonly IAccountService _accountService;
@@ -22,23 +24,20 @@ namespace FinTech.API.Controllers
             _accountService = accountService;
         }
         [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer")]
+        [Authorize(Roles = "customer,admin")]
         public async Task<ActionResult<CustomResponse<AccountDTO>>> Create(AccountCreateDTO accountCreateDTO)
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return CreateActionResultInstance(await _accountService.CreateAccountAccordingRulesAsync(userId, accountCreateDTO));
         }
         [HttpGet("{accountId}/balance")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer")]
+        [Authorize(Roles = "customer,admin")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> GetBalance(Guid accountId)
         {
             return CreateActionResultInstance( await _accountService.GetBalanceByAccountIdAsync(accountId));
         }
-        [HttpPost("{accountId}/balance")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "admin")]
+        [HttpPost("{accountId}/updateBalance")]
+        [Authorize(Roles = "manager,admin")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> UpdateBalance(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
         {
             return CreateActionResultInstance( await _accountService.UpdateBalanceAsync(accountId,balanceUpdateDTO));

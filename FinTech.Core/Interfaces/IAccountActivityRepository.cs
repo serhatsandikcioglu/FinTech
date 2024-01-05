@@ -9,7 +9,6 @@ namespace FinTech.Core.Interfaces
 {
     public interface IAccountActivityRepository : IGenericRepository<AccountActivity>
     {
-        Task AddAsync(AccountActivity accountActivity);
         Task<List<AccountActivity>> GetAllByAccountIdAsync(Guid accountId);
     }
 }

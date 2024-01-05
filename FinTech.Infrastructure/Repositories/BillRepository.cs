@@ -18,7 +18,7 @@ namespace FinTech.Infrastructure.Repositories
         {
             _dbSet = finTechDbContext.Set<Bill>();
         }
-        public async Task<List<Bill>> GetByNumber(string billNumber)
+        public async Task<List<Bill>> GetByNumberAsync(string billNumber)
         {
             return await _dbSet.Where(b => b.Number == billNumber && !b.IsPaid && b.DueDate.Date <= DateTime.UtcNow.Date).ToListAsync();
         }

@@ -19,11 +19,6 @@ namespace FinTech.Infrastructure.Repositories
         {
             _dbSet = finTechDbContext.Set<Account>();
         }
-
-        public async Task AddAsync(Account account)
-        {
-           await _dbSet.AddAsync(account);
-        }
         public async Task<string> GetBiggestAccountNumberAsync()
         {
             var biggestAccount = await _dbSet.OrderByDescending(x => x.Number).FirstOrDefaultAsync();
@@ -32,10 +27,6 @@ namespace FinTech.Infrastructure.Repositories
         public async Task<bool> AccountIsExistAsync(Guid accountId)
         {
             return await _dbSet.AnyAsync(x => x.Id == accountId);
-        }
-        public async Task< Account> GetByIdAsync(Guid accountId)
-        {
-            return await _dbSet.Where(x => x.Id == accountId).FirstOrDefaultAsync();
         }
         public async Task<Account> GetByAccountNumberAsync(string accountNumber)
         {

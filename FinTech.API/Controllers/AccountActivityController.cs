@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using FinTech.Core.DTOs.AccountActivity;
 using Microsoft.AspNetCore.Authorization;
+using FinTech.Core.Constans;
 
 namespace FinTech.API.Controllers
 {
     [Route("api/accountActivities")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer" , Roles = "customer,admin")]
     public class AccountActivityController : CustomBaseController
     {
         private readonly IAccountActivityService _accountActivityService;
@@ -19,8 +21,6 @@ namespace FinTech.API.Controllers
             _accountActivityService = accountActivityService;
         }
         [HttpPost("{accountId}")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer")]
         public async Task<ActionResult<CustomResponse<AccountActivityDTO>>> Create(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
         {
             return CreateActionResultInstance( await _accountActivityService.CreateAsync(accountId, accountActivityCreateDTO));

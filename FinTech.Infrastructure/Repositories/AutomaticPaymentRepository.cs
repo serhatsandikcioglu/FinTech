@@ -19,11 +19,7 @@ namespace FinTech.Infrastructure.Repositories
             _dbSet = finTechDbContext.Set<AutomaticPayment>();
         }
 
-        public async Task AddAsync(AutomaticPayment automaticPayment)
-        {
-           await _dbSet.AddAsync(automaticPayment);
-        }
-        public async Task<List<AutomaticPayment>> GetAllByUserId(Guid userId)
+        public async Task<List<AutomaticPayment>> GetAllByUserIdAsync(Guid userId)
         {
             return await _dbSet.Where(a=>a.userId == userId).ToListAsync();
         }

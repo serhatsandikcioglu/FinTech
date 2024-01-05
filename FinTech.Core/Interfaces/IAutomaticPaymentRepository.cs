@@ -9,8 +9,7 @@ namespace FinTech.Core.Interfaces
 {
     public interface IAutomaticPaymentRepository : IGenericRepository<AutomaticPayment>
     {
-        Task AddAsync(AutomaticPayment automaticPayment);
-        Task<List<AutomaticPayment>> GetAllByUserId(Guid userId);
+        Task<List<AutomaticPayment>> GetAllByUserIdAsync(Guid userId);
         Task<bool> IsExistAsync(Guid automaticPaymentId);
     }
 }

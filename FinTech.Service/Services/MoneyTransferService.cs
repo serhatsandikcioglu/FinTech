@@ -40,8 +40,8 @@ namespace FinTech.Service.Services
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                await AccountActivityCreateProcess(moneyTransfer.SenderAccountId, TransactionType.Withdrawal, moneyTransfer.Amount);
-                await AccountActivityCreateProcess(moneyTransfer.ReceiverAccountId, TransactionType.Deposit, moneyTransfer.Amount);
+                await AccountActivityCreateProcessAsync(moneyTransfer.SenderAccountId, TransactionType.Withdrawal, moneyTransfer.Amount);
+                await AccountActivityCreateProcessAsync(moneyTransfer.ReceiverAccountId, TransactionType.Deposit, moneyTransfer.Amount);
 
                 moneyTransfer.Date = DateTime.UtcNow;
 
@@ -58,7 +58,7 @@ namespace FinTech.Service.Services
             }
         }
 
-        public async Task<CustomResponse<NoContent>> ExternalTransfer(ExternalTransferCreateDTO externalTransferCreateDTO)
+        public async Task<CustomResponse<NoContent>> ExternalTransferAsync(ExternalTransferCreateDTO externalTransferCreateDTO)
         {
             Account receiverAccount = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(externalTransferCreateDTO.ReceiverAccountNumber);
             if (receiverAccount == null)
@@ -74,7 +74,7 @@ namespace FinTech.Service.Services
             return await PerformTransferAsync(moneyTransfer);
         }
 
-        public async Task<CustomResponse<NoContent>> InternalTransfer(InternalTransferCreateDTO internalTransferCreateDTO)
+        public async Task<CustomResponse<NoContent>> InternalTransferAsync(InternalTransferCreateDTO internalTransferCreateDTO)
         {
             MoneyTransfer moneyTransfer = _mapper.Map<MoneyTransfer>(internalTransferCreateDTO);
             return await PerformTransferAsync(moneyTransfer);
@@ -94,7 +94,7 @@ namespace FinTech.Service.Services
 
             return (false,remainingLimit);
         }
-        private async Task AccountActivityCreateProcess(Guid accountId, TransactionType transactionType, decimal amount)
+        private async Task AccountActivityCreateProcessAsync(Guid accountId, TransactionType transactionType, decimal amount)
         {
             var accountActivityCreateDTO = new AccountActivityCreateDTO
             {

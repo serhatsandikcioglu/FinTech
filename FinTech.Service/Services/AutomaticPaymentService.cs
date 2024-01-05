@@ -30,15 +30,14 @@ namespace FinTech.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<CustomResponse<AutomaticPaymentDTO>> CreateAsync(Guid accountId,Guid userId, AutomaticPaymentCreateDTO automaticPaymentCreateDTO)
+        public async Task<CustomResponse<AutomaticPaymentDTO>> CreateAsync(Guid userId, AutomaticPaymentCreateDTO automaticPaymentCreateDTO)
         {
-            bool accountExist = await _unitOfWork.AccountRepository.AccountIsExistAsync(accountId);
+            bool accountExist = await _unitOfWork.AccountRepository.AccountIsExistAsync(automaticPaymentCreateDTO.AccountId);
             if (!accountExist)
                 return CustomResponse<AutomaticPaymentDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
 
             AutomaticPayment automaticPayment = _mapper.Map<AutomaticPayment>(automaticPaymentCreateDTO);
             automaticPayment.userId = userId;
-            automaticPayment.AccountId = accountId;
             await _unitOfWork.AutomaticPaymentRepository.AddAsync(automaticPayment);
             await _unitOfWork.SaveChangesAsync();
 
@@ -59,7 +58,7 @@ namespace FinTech.Service.Services
 
         public async Task<CustomResponse<List<AutomaticPaymentDTO>>> GetAllByUserIdAsync(Guid userId)
         {
-           var automaticPayments = await _unitOfWork.AutomaticPaymentRepository.GetAllByUserId(userId);
+           var automaticPayments = await _unitOfWork.AutomaticPaymentRepository.GetAllByUserIdAsync(userId);
             if (automaticPayments == null)
             {
                 return CustomResponse<List<AutomaticPaymentDTO>>.Fail(StatusCodes.Status200OK,ErrorMessageConstants.AutomaticPaymentNotFound);
@@ -74,7 +73,7 @@ namespace FinTech.Service.Services
 
             foreach (var automaticPayment in automaticPayments)
             {
-                var bills = await _unitOfWork.BillRepository.GetByNumber(automaticPayment.BillNumber);
+                var bills = await _unitOfWork.BillRepository.GetByNumberAsync(automaticPayment.BillNumber);
 
                 foreach (var bill in bills)
                 {

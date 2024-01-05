@@ -9,7 +9,6 @@ using FinTech.Core.Models;
 using FinTech.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace FinTech.Service.Services
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
         }
-        public async Task<CustomResponse<UserDTO>> CreateCustomer(UserCreateDTO UserCreateDTO)
+        public async Task<CustomResponse<UserDTO>> CreateCustomerAsync(UserCreateDTO UserCreateDTO)
         {
             if (_userManager.Users.Any(u => u.IdentityNumber == UserCreateDTO.IdentityNumber))
                 return CustomResponse<UserDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InvalidIdNumber);
@@ -49,7 +48,7 @@ namespace FinTech.Service.Services
                 if (!result.Succeeded)
                     return CustomResponse<UserDTO>.Fail(StatusCodes.Status500InternalServerError, result.Errors.Select(x => x.Description).ToList());
 
-                await _userManager.AddToRoleAsync(appUser, RoleConstants.Customer);
+                await _userManager.AddToRoleAsync(appUser, "customer");
 
                 AccountCreateDTO accountCreateDTO = new AccountCreateDTO();
                 var accountResponse =  await _accountService.CreateAccountWithoutRulesAsync(appUser.Id, accountCreateDTO);
@@ -64,7 +63,7 @@ namespace FinTech.Service.Services
                 return CustomResponse<UserDTO>.Fail(StatusCodes.Status400BadRequest, new List<string> { ex.Message });
             }
         }
-        public async Task<CustomResponse<UserDTO>> CreateUser(UserCreateDTO UserCreateDTO)
+        public async Task<CustomResponse<UserDTO>> CreateUserAsync(UserCreateDTO UserCreateDTO)
         {
             if (_userManager.Users.Any(u => u.IdentityNumber == UserCreateDTO.IdentityNumber))
                 return CustomResponse<UserDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InvalidIdNumber);
@@ -79,7 +78,7 @@ namespace FinTech.Service.Services
                 var userDTO = _mapper.Map<UserDTO>(appUser);
                 return CustomResponse<UserDTO>.Success(StatusCodes.Status201Created, userDTO);
         }
-        public async Task<CustomResponse<NoContent>> AssignRole(Guid userIdGuid, RoleDTO roleDTO)
+        public async Task<CustomResponse<NoContent>> AssignRoleAsync(Guid userIdGuid, RoleDTO roleDTO)
         {
             string userId = userIdGuid.ToString();
             var user = await _userManager.FindByIdAsync(userId);
@@ -100,7 +99,7 @@ namespace FinTech.Service.Services
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.RoleOperationFailed);
             }
         }
-        public async Task<CustomResponse<NoContent>> DeleteRole(Guid userIdGuid, RoleDTO roleDTO)
+        public async Task<CustomResponse<NoContent>> DeleteRoleAsync(Guid userIdGuid, RoleDTO roleDTO)
         {
             string userId = userIdGuid.ToString();
             var user = await _userManager.FindByIdAsync(userId);
@@ -121,7 +120,7 @@ namespace FinTech.Service.Services
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.RoleOperationFailed);
             }
         }
-        public async Task<CustomResponse<UserRolesDTO>> GetRoles(Guid userIdGuid)
+        public async Task<CustomResponse<UserRolesDTO>> GetRolesAsync(Guid userIdGuid)
         {
             string userId = userIdGuid.ToString();
 

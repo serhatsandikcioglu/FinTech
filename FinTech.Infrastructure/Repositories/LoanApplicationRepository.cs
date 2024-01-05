@@ -19,11 +19,6 @@ namespace FinTech.Infrastructure.Repositories
         {
             _dbSet = finTechDbContext.Set<LoanApplication>();
         }
-
-        public async Task AddAsync(LoanApplication loanApplication)
-        {
-           await _dbSet.AddAsync(loanApplication);
-        }
         public async Task< List<PaymentStatus>>? GetPaymentStatusesByUserIdAsync(Guid applicationUserId)
         {
             var paymentStatuses = await _dbSet
@@ -32,10 +27,6 @@ namespace FinTech.Infrastructure.Repositories
             .Select(x => x.PaymentStatus)
             .ToListAsync();
             return paymentStatuses;
-        }
-        public async Task<LoanApplication> GetByIdAsync(Guid loanApplicationId)
-        {
-           return await _dbSet.Where(x => x.Id == loanApplicationId).FirstOrDefaultAsync();
         }
         public async Task<List<LoanApplication>> GetAllByUserIdAsync(Guid UserId)
         {

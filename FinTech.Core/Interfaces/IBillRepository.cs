@@ -9,6 +9,6 @@ namespace FinTech.Core.Interfaces
 {
     public interface IBillRepository : IGenericRepository<Bill>
     {
-        Task<List<Bill>> GetByNumber(string billNumber);
+        Task<List<Bill>> GetByNumberAsync(string billNumber);
     }
 }

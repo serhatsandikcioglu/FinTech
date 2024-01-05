@@ -11,9 +11,9 @@ using System.Security.Claims;
 
 namespace FinTech.API.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/automaticPayments")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer", Roles = RoleConstants.Customer)]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "customer,admin")]
     public class AutomaticPaymentController : CustomBaseController
     {
         private readonly IAutomaticPaymentService _automaticPaymentService;
@@ -22,24 +22,24 @@ namespace FinTech.API.Controllers
         {
             _automaticPaymentService = automaticPaymentService;
         }
-        [HttpPost("{accountId}")]
-        public async Task<ActionResult<CustomResponse<AutomaticPaymentDTO>>> Create(Guid accountId, AutomaticPaymentCreateDTO automaticPaymentCreateDTO)
+        [HttpPost]
+        public async Task<ActionResult<CustomResponse<AutomaticPaymentDTO>>> Create(AutomaticPaymentCreateDTO automaticPaymentCreateDTO)
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _automaticPaymentService.CreateAsync(accountId,userId,automaticPaymentCreateDTO));
+            return CreateActionResultInstance(await _automaticPaymentService.CreateAsync(userId,automaticPaymentCreateDTO));
         }
         [HttpDelete("{automaticPaymentId}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> Delete(Guid automaticPaymentId)
         {
             return CreateActionResultInstance(await _automaticPaymentService.DeleteAsync(automaticPaymentId));
         }
-        [HttpGet]
+        [HttpGet("byUser")]
         public async Task<ActionResult<CustomResponse<List<AutomaticPaymentDTO>>>> GetAllByUserId()
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return CreateActionResultInstance(await _automaticPaymentService.GetAllByUserIdAsync(userId));
         }
-        [HttpPost]
+        [HttpPost("bill")]
         [AllowAnonymous]
         public async Task<ActionResult<CustomResponse<NoContent>>> CreateBill(Bill bill) //This endpoint is for the automatic payment order test.
         {

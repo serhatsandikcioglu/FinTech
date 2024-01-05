@@ -137,15 +137,20 @@ namespace FinTech.Service.Services
             }
             
         }
-        public async Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserId(Guid userId)
+        public async Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserIdAsync(Guid userId)
         {
            List<LoanApplication> loanApplications =  await _unitOfWork.LoanApplicationRepository.GetAllByUserIdAsync(userId);
 
-            if (loanApplications == null)
-                return CustomResponse<List<LoanApplicationDTO>>.Fail(StatusCodes.Status404NotFound,ErrorMessageConstants.LoanApplicationNotFound);
-
             List<LoanApplicationDTO> loanApplicationDTOs = _mapper.Map<List<LoanApplicationDTO>>(loanApplications);
             return CustomResponse<List<LoanApplicationDTO>>.Success(StatusCodes.Status200OK,loanApplicationDTOs);
+        }
+        public async Task<CustomResponse<List<LoanApplicationDTO>>> GetAllAsync()
+        {
+            List<LoanApplication> loanApplications = await _unitOfWork.LoanApplicationRepository.GetAllAsync();
+
+
+            List<LoanApplicationDTO> loanApplicationDTOs = _mapper.Map<List<LoanApplicationDTO>>(loanApplications);
+            return CustomResponse<List<LoanApplicationDTO>>.Success(StatusCodes.Status200OK, loanApplicationDTOs);
         }
     }
 }

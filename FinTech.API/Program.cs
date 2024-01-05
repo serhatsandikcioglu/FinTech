@@ -66,11 +66,11 @@ using (var scope = app.Services.CreateScope())
     {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
         await roleManager.CreateAsync(new() { Name = "admin"});
-        await roleManager.CreateAsync(new() { Name = RoleConstants.Manager});
-        await roleManager.CreateAsync(new() { Name = RoleConstants.LoanOfficer });
-        await roleManager.CreateAsync(new() { Name = RoleConstants.SupportTicketAnalyst });
-        await roleManager.CreateAsync(new() { Name = RoleConstants.CustomerSupport });
-        await roleManager.CreateAsync(new() { Name = RoleConstants.Customer });
+        await roleManager.CreateAsync(new() { Name = "manager"});
+        await roleManager.CreateAsync(new() { Name = "loanofficer" });
+        await roleManager.CreateAsync(new() { Name = "supportticketanalyst" });
+        await roleManager.CreateAsync(new() { Name = "customersupport" });
+        await roleManager.CreateAsync(new() { Name = "customer" });
     }
     if (!dbContext.Users.Any())
     {
@@ -81,19 +81,19 @@ using (var scope = app.Services.CreateScope())
 
         var manager = new ApplicationUser() { UserName = "manager", Name = "Manager", Surname = "ManagerSurname", IdentityNumber = "11111111112", Address = "" };
         await userManager.CreateAsync(manager, "Asd123*");
-        await userManager.AddToRoleAsync(manager, RoleConstants.Manager);
+        await userManager.AddToRoleAsync(manager, "manager");
 
         var loanOfficer = new ApplicationUser() { UserName = "loanOfficer", Name = "loanOfficer", Surname = "loanOfficerSurname", IdentityNumber = "11111111113", Address = "" };
         await userManager.CreateAsync(loanOfficer, "Asd123*");
-        await userManager.AddToRoleAsync(loanOfficer, RoleConstants.LoanOfficer);
+        await userManager.AddToRoleAsync(loanOfficer, "loanofficer");
 
         var customerSupport = new ApplicationUser() { UserName = "customerSupport", Name = "CustomerSupport", Surname = "CustomerSupportSurname", IdentityNumber = "11111111114", Address = ""};
         await userManager.CreateAsync(customerSupport, "Asd123*");
-        await userManager.AddToRoleAsync(customerSupport, RoleConstants.CustomerSupport);
+        await userManager.AddToRoleAsync(customerSupport, "supportticketanalyst");
 
         var supportTicketAnalyst = new ApplicationUser() { UserName = "supportTicketAnalyst", Name = "supportTicketAnalyst", Surname = "supportTicketAnalystSurname", IdentityNumber = "11111111115", Address = "" };
         await userManager.CreateAsync(supportTicketAnalyst, "Asd123*");
-        await userManager.AddToRoleAsync(supportTicketAnalyst, RoleConstants.SupportTicketAnalyst);
+        await userManager.AddToRoleAsync(supportTicketAnalyst, "customersupport");
     }
 }
 // Configure the HTTP request pipeline.

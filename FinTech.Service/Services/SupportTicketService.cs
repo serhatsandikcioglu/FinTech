@@ -33,13 +33,13 @@ namespace FinTech.Service.Services
             supportTicket.Status = TicketStatus.Pending;
 
             await _unitOfWork.SupportTicketRepository.AddAsync(supportTicket);
-            await _unitOfWork.SaveChangesAsync();
             SupportTicketCreatedDTO supportTicketCreatedDTO = _mapper.Map<SupportTicketCreatedDTO>(supportTicket);
+            await _unitOfWork.SaveChangesAsync();
             return CustomResponse<SupportTicketCreatedDTO>.Success(StatusCodes.Status201Created, supportTicketCreatedDTO);
         }
         public async Task<CustomResponse<SupportTicketDTO>> GetByWithoutPrioritizationStatusAsync()
         {
-            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetOldestUnprioritizedSupportRequest();
+            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetOldestUnprioritizedSupportRequestAsync();
 
             if (supportTicket == null)
                 return CustomResponse<SupportTicketDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.SupportTicketNotFound);
@@ -49,7 +49,7 @@ namespace FinTech.Service.Services
         }
         public async Task<CustomResponse<NoContent>> DeterminePriortyLevelAsync(Guid supportTicketId, TicketPriorityLevel ticketPriorityLevel)
         {
-            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetById(supportTicketId);
+            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetByIdAsync(supportTicketId);
 
             if (supportTicket == null)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.SupportTicketNotFound);
@@ -63,7 +63,7 @@ namespace FinTech.Service.Services
         }
         public async Task<CustomResponse<SupportTicketDTO>> GetByPriorityStatusAsync()
         {
-            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetOldestPendingPrioritySupportRequest();
+            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetOldestPendingPrioritySupportRequestAsync();
 
             if (supportTicket == null)
                 return CustomResponse<SupportTicketDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.SupportTicketNotFound);
@@ -73,7 +73,7 @@ namespace FinTech.Service.Services
         }
         public async Task<CustomResponse<NoContent>> ProcessAsync(Guid supportTicketId)
         {
-            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetById(supportTicketId);
+            SupportTicket supportTicket = await _unitOfWork.SupportTicketRepository.GetByIdAsync(supportTicketId);
 
             if (supportTicket == null)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.SupportTicketNotFound);

@@ -8,6 +8,7 @@ namespace FinTech.Core.DTOs.AutomaticPayment
 {
     public class AutomaticPaymentCreateDTO
     {
+        public Guid AccountId { get; set; }
         public string BillNumber { get; set; }
     }
 }

@@ -11,8 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinTech.API.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/users")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "manager,admin")]
     public class UserController : CustomBaseController
     {
         private readonly IUserService _userService;
@@ -20,38 +21,31 @@ namespace FinTech.API.Controllers
         {
             _userService = userService;
         }
-        [HttpPost]
+        [HttpPost("customer")]
+        [AllowAnonymous]
         public async Task<ActionResult<CustomResponse<UserDTO>>> CreateCustomer(UserCreateDTO userCreateDTO)
         {
-            return CreateActionResultInstance(await _userService.CreateCustomer(userCreateDTO));
+            return CreateActionResultInstance(await _userService.CreateCustomerAsync(userCreateDTO));
         }
-        [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = RoleConstants.Manager)]
+        [HttpPost("user")]
         public async Task<ActionResult<CustomResponse<UserDTO>>> CreateUser(UserCreateDTO userCreateDTO)
         {
-            return CreateActionResultInstance(await _userService.CreateUser(userCreateDTO));
+            return CreateActionResultInstance(await _userService.CreateUserAsync(userCreateDTO));
         }
-        [HttpGet("{userId}")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = RoleConstants.Manager)]
+        [HttpGet("[action]/{userId}")]
         public async Task<ActionResult<CustomResponse<UserRolesDTO>>> GetRolesFromUser(Guid userId)
         {
-            return CreateActionResultInstance(await _userService.GetRoles(userId));
+            return CreateActionResultInstance(await _userService.GetRolesAsync(userId));
         }
-        [HttpDelete("{userId}")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = RoleConstants.Manager)]
+        [HttpDelete("[action]/{userId}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> DeleteRoleFromUser(Guid userId, RoleDTO roleDTO)
         {
-            return CreateActionResultInstance(await _userService.DeleteRole(userId,roleDTO));
+            return CreateActionResultInstance(await _userService.DeleteRoleAsync(userId,roleDTO));
         }
-        [HttpPost("{userId}")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = RoleConstants.Manager)]
+        [HttpPost("[action]/{userId}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> AddRoleToUser(Guid userId, RoleDTO roleDTO)
         {
-            return CreateActionResultInstance(await _userService.AssignRole(userId,roleDTO));
+            return CreateActionResultInstance(await _userService.AssignRoleAsync(userId,roleDTO));
         }
     }
 }

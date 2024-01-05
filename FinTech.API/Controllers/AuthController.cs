@@ -18,7 +18,7 @@ namespace FinTech.API.Controllers
         {
             _authService = authService;
         }
-        [HttpPost]
+        [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult<CustomResponse<TokenDTO>>> Login(LoginDTO loginDTO)
         {

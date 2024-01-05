@@ -9,9 +9,7 @@ namespace FinTech.Core.Interfaces
 {
     public interface ISupportTicketRepository : IGenericRepository<SupportTicket>
     {
-        Task AddAsync(SupportTicket supportTicket);
-        Task<SupportTicket> GetOldestUnprioritizedSupportRequest();
-        Task<SupportTicket> GetOldestPendingPrioritySupportRequest();
-        Task<SupportTicket> GetById(Guid id);
+        Task<SupportTicket> GetOldestUnprioritizedSupportRequestAsync();
+        Task<SupportTicket> GetOldestPendingPrioritySupportRequestAsync();
     }
 }

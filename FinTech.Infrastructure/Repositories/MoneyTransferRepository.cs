@@ -18,11 +18,6 @@ namespace FinTech.Infrastructure.Repositories
         {
             _dbSet = finTechDbContext.Set<MoneyTransfer>();
         }
-
-        public async Task AddAsync(MoneyTransfer moneyTransfer)
-        {
-           await _dbSet.AddAsync(moneyTransfer);
-        }
         public async Task<List<decimal>> GetDailyTransferAmountAsync(Guid senderAccountId , DateTime date)
         {
             List<decimal> amounts = await _dbSet.Where(x => x.SenderAccountId == senderAccountId && x.Date.Date == date.Date).Select(x=>x.Amount).ToListAsync();

@@ -9,6 +9,5 @@ namespace FinTech.Core.Interfaces
 {
     public interface IRepaymentPlanRepository : IGenericRepository<RepaymentPlan>
     {
-        Task AddAsync(RepaymentPlan repaymentPlan);
     }
 }

@@ -19,10 +19,5 @@ namespace FinTech.Infrastructure.Repositories
         {
             _dbSet = finTechDbContext.Set<RepaymentPlan>();
         }
-
-        public async Task AddAsync(RepaymentPlan repaymentPlan)
-        {
-          await  _dbSet.AddAsync(repaymentPlan);
-        }
     }
 }

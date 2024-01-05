@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using FinTech.Core.DTOs.MoneyTransfer;
 using Microsoft.AspNetCore.Authorization;
+using FinTech.Core.Constans;
 
 namespace FinTech.API.Controllers
 {
-    [Route("api/moneyTransfers/[action]")]
+    [Route("api/moneyTransfers")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer" , Roles = "customer,admin")]
     public class MoneyTransferController : CustomBaseController
     {
         private readonly IMoneyTransferService _moneyTransferService;
@@ -18,19 +20,15 @@ namespace FinTech.API.Controllers
         {
             _moneyTransferService = moneyTransferService;
         }
-        [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer")]
+        [HttpPost("externalTransfer")]
         public async Task<ActionResult<CustomResponse<NoContent>>> ExternalTransfer(ExternalTransferCreateDTO externalTransferCreateDTO)
         {
-            return CreateActionResultInstance( await _moneyTransferService.ExternalTransfer(externalTransferCreateDTO));
+            return CreateActionResultInstance( await _moneyTransferService.ExternalTransferAsync(externalTransferCreateDTO));
         }
-        [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer")]
+        [HttpPost("internalTransfer")]
         public async Task<ActionResult<CustomResponse<NoContent>>> InternalTransfer(InternalTransferCreateDTO internalTransferCreateDTO)
         {
-            return CreateActionResultInstance(await _moneyTransferService.InternalTransfer(internalTransferCreateDTO));
+            return CreateActionResultInstance(await _moneyTransferService.InternalTransferAsync(internalTransferCreateDTO));
         }
     }
 }
