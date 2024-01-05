@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.Interfaces
 {
-    public interface ILoanApplicationRepository
+    public interface ILoanApplicationRepository : IGenericRepository<LoanApplication>
     {
         Task AddAsync(LoanApplication loanApplication);
         Task<List<PaymentStatus>>? GetPaymentStatusesByUserIdAsync(Guid applicationUserId);

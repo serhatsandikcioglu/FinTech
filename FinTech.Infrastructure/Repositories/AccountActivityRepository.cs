@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace FinTech.Infrastructure.Repositories
 {
-    public class AccountActivityRepository : IAccountActivityRepository
+    public class AccountActivityRepository : GenericRepository<AccountActivity>, IAccountActivityRepository
     {
         private readonly DbSet<AccountActivity> _dbSet;
 
-        public AccountActivityRepository(FinTechDbContext finTechDbContext)
+        public AccountActivityRepository(FinTechDbContext finTechDbContext) : base(finTechDbContext)
         {
             _dbSet = finTechDbContext.Set<AccountActivity>();
         }

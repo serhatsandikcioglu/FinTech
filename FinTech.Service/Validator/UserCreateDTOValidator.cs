@@ -40,9 +40,6 @@ namespace FinTech.Service.Validator
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("PhoneNumber cannot be empty.")
                 .Length(10).WithMessage("PhoneNumber must be 10 digits.");
-
-            RuleFor(x => x.MonthlyIncome)
-                .GreaterThan(0).WithMessage("MonthlyIncome must be non-negative.");
         }
     }
 }

@@ -45,8 +45,8 @@ namespace FinTech.Service.Services
                 accountActivity.Date = DateTime.UtcNow;
                 accountActivity.AccountId = account.Id;
 
-                AccountActivityDTO accountActivityDTO = _mapper.Map<AccountActivityDTO>(accountActivity);
                 await _unitOfWork.AccountActivityRepository.AddAsync(accountActivity);
+                AccountActivityDTO accountActivityDTO = _mapper.Map<AccountActivityDTO>(accountActivity);
                 await _unitOfWork.SaveChangesAsync();
                 return CustomResponse<AccountActivityDTO>.Success(StatusCodes.Status201Created, accountActivityDTO);
             }

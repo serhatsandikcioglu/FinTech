@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.Interfaces
 {
-    public interface ISupportTicketRepository
+    public interface ISupportTicketRepository : IGenericRepository<SupportTicket>
     {
         Task AddAsync(SupportTicket supportTicket);
         Task<SupportTicket> GetOldestUnprioritizedSupportRequest();

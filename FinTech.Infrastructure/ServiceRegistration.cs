@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,10 @@ namespace FinTech.Infrastructure
             services.AddScoped<UserManager<ApplicationUser>>();
             services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
             services.AddScoped<ISupportTicketService, SupportTicketService>();
+            services.AddScoped<IAutomaticPaymentRepository, AutomaticPaymentRepository>();
+            services.AddScoped<IAutomaticPaymentService, AutomaticPaymentService>();
+            services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             services.Configure<CustomTokenOption>(configuration.GetSection("TokenOption"));
 
@@ -71,6 +76,21 @@ namespace FinTech.Infrastructure
                     ClockSkew = TimeSpan.Zero
                 };
             });
+
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                var jobkey = new JobKey("automaticPayment");
+
+                q.AddJob<AutomaticPaymentJob>(opt => opt.WithIdentity(jobkey));
+
+                q.AddTrigger(opt =>
+                opt.ForJob(jobkey)
+                .WithIdentity("automaticPayment-trigger")
+                .WithCronSchedule("0 0/1 * * * ?"));
+            });
+
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
             return services;
         }

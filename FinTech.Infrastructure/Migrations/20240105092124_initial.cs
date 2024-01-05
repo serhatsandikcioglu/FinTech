@@ -35,7 +35,6 @@ namespace FinTech.Infrastructure.Migrations
                     Surname = table.Column<string>(type: "text", nullable: false),
                     IdentityNumber = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
-                    MonthlyIncome = table.Column<int>(type: "integer", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -54,6 +53,21 @@ namespace FinTech.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bills",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Number = table.Column<string>(type: "text", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsPaid = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bills", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -268,7 +282,8 @@ namespace FinTech.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AccountId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false)
+                    BillNumber = table.Column<string>(type: "text", nullable: false),
+                    userId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -400,6 +415,9 @@ namespace FinTech.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AutomaticPayments");
+
+            migrationBuilder.DropTable(
+                name: "Bills");
 
             migrationBuilder.DropTable(
                 name: "MoneyTransfers");

@@ -39,7 +39,7 @@ namespace FinTech.Service.Services
         public async Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(Guid applicationUserId, AccountCreateDTO accountCreateDTO)
         {
             if (accountCreateDTO.Balance < AccountConstants.MinimumInitialBalance)
-                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InitialBalanceError);
+                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, $"{ErrorMessageConstants.InitialBalanceError}. Minimum Balance {AccountConstants.MinimumInitialBalance}");
 
             try
             {

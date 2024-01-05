@@ -25,16 +25,16 @@ namespace FinTech.API.Controllers
         [Authorize(Roles = "customer")]
         public async Task<ActionResult<CustomResponse<LoanApplicationDTO>>> Create(LoanApplicationCreateDTO loanApplicationCreateDTO)
         {
-            Guid customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _loanApplicationService.CreateAsync(customerId, loanApplicationCreateDTO));
+            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return CreateActionResultInstance(await _loanApplicationService.CreateAsync(userId, loanApplicationCreateDTO));
         }
         [HttpGet("GetAllByUser")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Roles = "customer")]
-        public async Task<ActionResult<CustomResponse<LoanApplicationDTO>>> GetAllByUser()
+        public async Task<ActionResult<CustomResponse<LoanApplicationDTO>>> GetAllByUserId()
         {
-            Guid customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _loanApplicationService.GetAllByUserId(customerId));
+            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return CreateActionResultInstance(await _loanApplicationService.GetAllByUserId(userId));
         }
         [HttpPut("{loanApplicationId}/evaluation")]
         [Authorize(AuthenticationSchemes = "Bearer")]

@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace FinTech.Infrastructure.Repositories
 {
-    public class SupportTicketRepository : ISupportTicketRepository
+    public class SupportTicketRepository : GenericRepository<SupportTicket>,ISupportTicketRepository
     {
         private readonly DbSet<SupportTicket> _dbSet;
 
-        public SupportTicketRepository(FinTechDbContext finTechDbContext)
+        public SupportTicketRepository(FinTechDbContext finTechDbContext) : base(finTechDbContext)
         {
             _dbSet = finTechDbContext.Set<SupportTicket>();
         }

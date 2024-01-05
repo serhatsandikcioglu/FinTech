@@ -31,5 +31,6 @@ namespace FinTech.Infrastructure.Database
         public DbSet<MoneyTransfer> MoneyTransfers { get; set; }
         public DbSet<SupportTicket> SupportTickets { get; set; }
         public DbSet<RepaymentPlan> RepaymentPlans { get; set; }
+        public DbSet<Bill> Bills { get; set; }
     }
 }

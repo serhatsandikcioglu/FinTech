@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FinTech.Core.DTOs.Account;
 using FinTech.Core.DTOs.AccountActivity;
+using FinTech.Core.DTOs.AutomaticPayment;
 using FinTech.Core.DTOs.Balance;
 using FinTech.Core.DTOs.LoanApplication;
 using FinTech.Core.DTOs.MoneyTransfer;
@@ -39,6 +40,11 @@ namespace FinTech.Core.Mapper
             CreateMap<SupportTicket, SupportTicketDTO>().ReverseMap();
             CreateMap<SupportTicket, SupportTicketCreateDTO>().ReverseMap();
             CreateMap<SupportTicket, SupportTicketCreatedDTO>().ReverseMap();
+
+
+            CreateMap<AutomaticPayment, AutomaticPaymentCreateDTO>().ReverseMap();
+            CreateMap<AutomaticPayment, AutomaticPaymentDTO>().ReverseMap();
+
 
         }
     }

@@ -16,6 +16,8 @@ namespace FinTech.Core.Interfaces
         ILoanApplicationRepository LoanApplicationRepository { get; }
         IRepaymentPlanRepository RepaymentPlanRepository { get; }
         ISupportTicketRepository SupportTicketRepository { get; }
+        IAutomaticPaymentRepository AutomaticPaymentRepository { get; }
+        IBillRepository BillRepository { get; }
         Task SaveChangesAsync();
         IDbContextTransaction Transaction { get; }
         Task BeginTransactionAsync();

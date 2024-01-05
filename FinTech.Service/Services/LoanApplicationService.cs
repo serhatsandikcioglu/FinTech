@@ -75,8 +75,8 @@ namespace FinTech.Service.Services
             loanApplication.ApplicationUserId = applicationUserId;
             loanApplication.CreditScoreResultComment = await CalculateCreditScoreAsync(applicationUserId, loanApplicationCreateDTO.MonthlyIncome);
 
-            LoanApplicationDTO loanApplicationDTO = _mapper.Map<LoanApplicationDTO>(loanApplication);
             await _unitOfWork.LoanApplicationRepository.AddAsync(loanApplication);
+            LoanApplicationDTO loanApplicationDTO = _mapper.Map<LoanApplicationDTO>(loanApplication);
             await _unitOfWork.SaveChangesAsync();
             return CustomResponse<LoanApplicationDTO>.Success(StatusCodes.Status201Created, loanApplicationDTO);
         }

@@ -22,12 +22,32 @@ namespace FinTech.Infrastructure.Repositories
             _serviceProvider = serviceProvider;
         }
 
+        private IBillRepository _billRepository;
+        private IAutomaticPaymentRepository _automaticPaymentRepository;
         private ISupportTicketRepository _supportTicketRepository;
         private IAccountRepository _accountRepository;
         private IAccountActivityRepository _accountActivityRepository;
         private IMoneyTransferRepository _moneyTransferRepository;
         private ILoanApplicationRepository _loanApplicationRepository;
         private IRepaymentPlanRepository _repaymentPlanRepository;
+        public IBillRepository BillRepository
+        {
+            get
+            {
+                if (_billRepository == default(IBillRepository))
+                    _billRepository = _serviceProvider.GetRequiredService<IBillRepository>();
+                return _billRepository;
+            }
+        }
+        public IAutomaticPaymentRepository AutomaticPaymentRepository
+        {
+            get
+            {
+                if (_automaticPaymentRepository == default(IAutomaticPaymentRepository))
+                    _automaticPaymentRepository = _serviceProvider.GetRequiredService<IAutomaticPaymentRepository>();
+                return _automaticPaymentRepository;
+            }
+        }
         public ISupportTicketRepository SupportTicketRepository
         {
             get

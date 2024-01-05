@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.Interfaces
 {
-    public interface IAccountRepository
+    public interface IAccountRepository : IGenericRepository<Account>
     {
         Task AddAsync(Account account);
         Task<string> GetBiggestAccountNumberAsync();

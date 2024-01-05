@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.Interfaces
 {
-    public interface IMoneyTransferRepository
+    public interface IMoneyTransferRepository : IGenericRepository<MoneyTransfer>
     {
         Task AddAsync(MoneyTransfer moneyTransfer);
         Task<List<decimal>> GetDailyTransferAmountAsync(Guid senderAccountId, DateTime date);

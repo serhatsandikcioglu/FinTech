@@ -10,6 +10,7 @@ namespace FinTech.Core.Entities
     {
         public Guid AccountId { get; set; }
         public Account Account { get; set; }
-        public decimal Amount { get; set; }
+        public string BillNumber { get; set; }
+        public Guid userId { get; set; }
     }
 }

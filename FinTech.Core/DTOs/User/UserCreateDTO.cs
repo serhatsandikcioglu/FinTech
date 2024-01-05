@@ -17,6 +17,5 @@ namespace FinTech.Core.DTOs.User
         public string Address { get; set; }
         public string Mail { get; set; }
         public string PhoneNumber { get; set; }
-        public int MonthlyIncome { get; set; }
     }
 }

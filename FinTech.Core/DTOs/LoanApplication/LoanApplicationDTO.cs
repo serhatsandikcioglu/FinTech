@@ -12,7 +12,6 @@ namespace FinTech.Core.DTOs.LoanApplication
     public class LoanApplicationDTO
     {
         public Guid Id { get; set; }
-        public Guid CustomerId { get; set; }
         public decimal Amount { get; set; }
         public int MaturityTerm { get; set; }
         public LoanApllicationStatus Status { get; set; }

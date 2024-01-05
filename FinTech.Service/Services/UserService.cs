@@ -52,9 +52,9 @@ namespace FinTech.Service.Services
                 await _userManager.AddToRoleAsync(appUser, RoleConstants.Customer);
 
                 AccountCreateDTO accountCreateDTO = new AccountCreateDTO();
-                await _accountService.CreateAccountWithoutRulesAsync(appUser.Id, accountCreateDTO);
+                var accountResponse =  await _accountService.CreateAccountWithoutRulesAsync(appUser.Id, accountCreateDTO);
                 var userDTO = _mapper.Map<UserDTO>(appUser);
-
+                userDTO.AccountNumber = accountResponse.Data.Number;
                 await _unitOfWork.CommitAsync();
                 return CustomResponse<UserDTO>.Success(StatusCodes.Status201Created, userDTO);
             }

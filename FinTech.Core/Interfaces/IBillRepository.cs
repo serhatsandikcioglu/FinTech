@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace FinTech.Core.Interfaces
 {
-    public interface IRepaymentPlanRepository : IGenericRepository<RepaymentPlan>
+    public interface IBillRepository : IGenericRepository<Bill>
     {
-        Task AddAsync(RepaymentPlan repaymentPlan);
+        Task<List<Bill>> GetByNumber(string billNumber);
     }
 }
