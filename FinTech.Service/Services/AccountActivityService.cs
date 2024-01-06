@@ -22,7 +22,8 @@ namespace FinTech.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        private static readonly Dictionary<Guid, SemaphoreSlim> _accountLocks = new Dictionary<Guid, SemaphoreSlim>();
+        private static readonly SemaphoreSlim _globalLock = new SemaphoreSlim(1, 1);
         public AccountActivityService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -33,12 +34,16 @@ namespace FinTech.Service.Services
         {
             Account account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId);
             if (account == null)
-                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound );
+                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
 
-            if (accountActivityCreateDTO.TransactionType == TransactionType.Withdrawal && accountActivityCreateDTO.Amount >(await GetBalanceAsync(accountId)) )
+            if (accountActivityCreateDTO.TransactionType == TransactionType.Withdrawal && accountActivityCreateDTO.Amount > (await GetBalanceAsync(accountId)))
                 return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InsufficientFunds);
 
-            await _semaphoreSlim.WaitAsync();
+            await _globalLock.WaitAsync();
+            var accountLock = GetAccountLock(accountId);
+            await accountLock.WaitAsync();
+            _globalLock.Release();
+
             try
             {
                 AccountActivity accountActivity = _mapper.Map<AccountActivity>(accountActivityCreateDTO);
@@ -46,6 +51,7 @@ namespace FinTech.Service.Services
                 accountActivity.AccountId = account.Id;
 
                 await _unitOfWork.AccountActivityRepository.AddAsync(accountActivity);
+                Thread.Sleep(10000);
                 AccountActivityDTO accountActivityDTO = _mapper.Map<AccountActivityDTO>(accountActivity);
                 await _unitOfWork.SaveChangesAsync();
                 return CustomResponse<AccountActivityDTO>.Success(StatusCodes.Status201Created, accountActivityDTO);
@@ -56,9 +62,10 @@ namespace FinTech.Service.Services
             }
             finally
             {
-                  _semaphoreSlim.Release();
+                accountLock.Release();
             }
         }
+
         private async Task<decimal> GetBalanceAsync(Guid accountId)
         {
             var accountActivities = await _unitOfWork.AccountActivityRepository.GetAllByAccountIdAsync(accountId);
@@ -77,6 +84,18 @@ namespace FinTech.Service.Services
             }
 
             return totalBalance;
+        }
+        private SemaphoreSlim GetAccountLock(Guid accountId)
+        {
+            lock (_accountLocks)
+            {
+                if (!_accountLocks.TryGetValue(accountId, out var accountLock))
+                {
+                    accountLock = new SemaphoreSlim(1, 1);
+                    _accountLocks.Add(accountId, accountLock);
+                }
+                return accountLock;
+            }
         }
     }
 }
