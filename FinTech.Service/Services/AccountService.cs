@@ -20,6 +20,7 @@ using FinTech.Core.DTOs.Account;
 using FinTech.Core.DTOs.Balance;
 using FinTech.Core.DTOs.AccountActivity;
 using FinTech.Core.Constans;
+using System.Security.Principal;
 
 namespace FinTech.Service.Services
 {
@@ -108,10 +109,15 @@ namespace FinTech.Service.Services
 
         public async Task<CustomResponse<BalanceDTO>> GetBalanceByAccountIdAsync(Guid accountId)
         {
+            var accountOwnerId = await _unitOfWork.AccountRepository.GetUserIdById(accountId);
+            if (!(Guid.Parse(_httpContextData.UserId!) == accountOwnerId) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Admin) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Manager))
+                return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.ForbiddenAccount);
+
             bool accountExist = await _unitOfWork.AccountRepository.AccountIsExistAsync(accountId);
             if (!accountExist)
                 return CustomResponse<BalanceDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.AccountNotFound);
             var accountActivities = await _unitOfWork.AccountActivityRepository.GetAllByAccountIdAsync(accountId);
+
             decimal totalBalance = 0;
 
             foreach (var activity in accountActivities)

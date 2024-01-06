@@ -10,6 +10,6 @@ namespace FinTech.Service.Interfaces
 {
     public interface IAccountActivityService
     {
-        Task<CustomResponse<AccountActivityDTO>> CreateAsync(Guid accountId , AccountActivityCreateDTO accountActivityCreateDTO);
+        Task<CustomResponse<AccountActivityDTO>> CreateAsync(Guid accountId , AccountActivityCreateDTO accountActivityCreateDTO,Guid? userId = null);
     }
 }

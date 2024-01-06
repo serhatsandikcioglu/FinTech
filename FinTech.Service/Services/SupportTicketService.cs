@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FinTech.Core.Constans;
+using FinTech.Core.DTOs.LoanApplication;
 
 namespace FinTech.Service.Services
 {
@@ -87,6 +88,13 @@ namespace FinTech.Service.Services
             await _unitOfWork.SaveChangesAsync();
             return CustomResponse<NoContent>.Success(StatusCodes.Status200OK);
 
+        }
+        public async Task<CustomResponse<List<SupportTicketDTO>>> GetAllByUserIdAsync()
+        {
+            List<SupportTicket> supportTickets = await _unitOfWork.SupportTicketRepository.GetAllByUserIdAsync(Guid.Parse(_httpContextData.UserId!));
+
+            List<SupportTicketDTO> supportTicketDTO = _mapper.Map<List<SupportTicketDTO>>(supportTickets);
+            return CustomResponse<List<SupportTicketDTO>>.Success(StatusCodes.Status200OK,supportTicketDTO);
         }
     }
 }

@@ -31,12 +31,16 @@ namespace FinTech.Service.Services
             _httpContextData = httpContextData;
         }
 
-        public async Task<CustomResponse<AccountActivityDTO>> CreateAsync(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
+        public async Task<CustomResponse<AccountActivityDTO>> CreateAsync(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO,Guid? userId)
         {
+            string? currentUserId = _httpContextData.UserId;
+            if (userId != null && userId != Guid.Empty)
+                currentUserId = userId.ToString();
+
             Account account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId);
 
-            if (!(Guid.Parse(_httpContextData.UserId!) == account.ApplicationUser.Id) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Admin) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Manager))
-                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status403Forbidden, ErrorMessageConstants.ForbiddenAccount);
+            if (!(Guid.Parse(currentUserId!) == account.ApplicationUser.Id) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Admin) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Manager))
+               return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.ForbiddenAccount);
 
             if (account == null)
                 return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);

@@ -26,6 +26,6 @@ namespace FinTech.Core.Constans
         public const string SupportTicketProcessed = "Support Ticket Processed Already";
         public const string NameAndSurnameDontMatch = "Name And Surname Dont Match";
         public const string AutomaticPaymentNotFound = "Automatic Payment Not Found";
-        public const string ForbiddenAccount = "You Are Not Authorized To Send Money By Account";
+        public const string ForbiddenAccount = "You Are Not Authorized To Process On This Account.";
     }
 }

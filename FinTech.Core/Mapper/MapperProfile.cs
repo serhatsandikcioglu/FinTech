@@ -32,7 +32,7 @@ namespace FinTech.Core.Mapper
             CreateMap<LoanApplication, LoanApplicationCreateDTO>().ReverseMap();
             CreateMap<LoanApplication, LoanApplicationDTO>().ReverseMap();
 
-            CreateMap<ApplicationUser, UserDTO>().ReverseMap();
+            CreateMap<ApplicationUser, UserDTO>().ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
             CreateMap<ApplicationUser, UserCreateDTO>().ReverseMap();
 
             CreateMap<BalanceUpdateDTO, BalanceDTO>().ReverseMap();

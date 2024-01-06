@@ -12,6 +12,7 @@ namespace FinTech.API.Controllers
 {
     [Route("api/loanApplications")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class LoanApplicationController : CustomBaseController
     {
         private readonly ILoanApplicationService _loanApplicationService;
@@ -22,28 +23,25 @@ namespace FinTech.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+
         [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<LoanApplicationDTO>>> Create(LoanApplicationCreateDTO loanApplicationCreateDTO)
         {
             return CreateActionResultInstance(await _loanApplicationService.CreateAsync(loanApplicationCreateDTO));
         }
         [HttpGet("byUser")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<List<LoanApplicationDTO>>>> GetAllByUserId()
         {
             return CreateActionResultInstance(await _loanApplicationService.GetAllByUserIdAsync());
         }
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Roles = $"{RoleConstants.LoanOfficer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<List<LoanApplicationDTO>>>> GetAll()
         {
             return CreateActionResultInstance(await _loanApplicationService.GetAllAsync());
         }
         [HttpPut("evaluation/{loanApplicationId}")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
         [Authorize(Roles = $"{RoleConstants.LoanOfficer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> LoanApplicationEvaluation(Guid loanApplicationId , LoanApplicationEvaluationDTO loanApplicationEvaluationDTO)
         {

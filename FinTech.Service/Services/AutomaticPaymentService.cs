@@ -76,6 +76,7 @@ namespace FinTech.Service.Services
             foreach (var automaticPayment in automaticPayments)
             {
                 var bills = await _unitOfWork.BillRepository.GetByNumberAsync(automaticPayment.BillNumber);
+                var userId = automaticPayment.userId;
 
                 foreach (var bill in bills)
                 {
@@ -90,7 +91,7 @@ namespace FinTech.Service.Services
                                 Amount = bill.Amount,
                                 TransactionType = Core.Enums.TransactionType.Withdrawal
                             };
-                            var paymentResponse = await _accountActivityService.CreateAsync(automaticPayment.AccountId, accountActivityCreateDTO);
+                            var paymentResponse = await _accountActivityService.CreateAsync(automaticPayment.AccountId, accountActivityCreateDTO,userId);
 
                             if (paymentResponse.Succeeded)
                                 bill.IsPaid = true;
