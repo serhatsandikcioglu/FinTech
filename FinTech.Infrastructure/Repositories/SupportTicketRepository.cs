@@ -39,5 +39,9 @@ namespace FinTech.Infrastructure.Repositories
 
             return ticket;
         }
+        public async Task<List<SupportTicket>> GetAllByUserIdAsync(Guid UserId)
+        {
+            return await _dbSet.Where(s => s.ApplicationUserId == UserId).ToListAsync();
+        }
     }
 }

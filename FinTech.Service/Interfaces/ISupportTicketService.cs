@@ -16,5 +16,6 @@ namespace FinTech.Service.Interfaces
         Task<CustomResponse<SupportTicketDTO>> GetByPriorityStatusAsync();
         Task<CustomResponse<NoContent>> ProcessAsync(Guid supportTicketId);
         Task<CustomResponse<NoContent>> DeterminePriortyLevelAsync(Guid supportTicketId, TicketPriorityLevel ticketPriorityLevel);
+        Task<CustomResponse<List<SupportTicketDTO>>> GetAllByUserIdAsync();
     }
 }

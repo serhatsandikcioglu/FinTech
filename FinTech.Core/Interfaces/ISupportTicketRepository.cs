@@ -11,5 +11,6 @@ namespace FinTech.Core.Interfaces
     {
         Task<SupportTicket> GetOldestUnprioritizedSupportRequestAsync();
         Task<SupportTicket> GetOldestPendingPrioritySupportRequestAsync();
+        Task<List<SupportTicket>> GetAllByUserIdAsync(Guid UserId);
     }
 }

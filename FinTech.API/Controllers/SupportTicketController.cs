@@ -1,4 +1,5 @@
 ﻿using FinTech.Core.Constans;
+using FinTech.Core.DTOs.LoanApplication;
 using FinTech.Core.DTOs.SupportTicket;
 using FinTech.Core.DTOs.User;
 using FinTech.Core.Enums;
@@ -29,6 +30,12 @@ namespace FinTech.API.Controllers
         {
             return CreateActionResultInstance(await _supportTicketService.CreateAsync(supportTicketCreateDTO));
         }
+        [HttpGet("byUser")]
+        [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
+        public async Task<ActionResult<CustomResponse<List<SupportTicketDTO>>>> GetAllByUserId()
+        {
+            return CreateActionResultInstance(await _supportTicketService.GetAllByUserIdAsync());
+        }
         [HttpGet("byWithoutPrioritizationStatus")]
         [Authorize(Roles = $"{RoleConstants.SupportTicketAnalyst},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<SupportTicketDTO>>> GetByWithoutPrioritizationStatus()
@@ -53,5 +60,6 @@ namespace FinTech.API.Controllers
         {
             return CreateActionResultInstance(await _supportTicketService.ProcessAsync(supportTicketId));
         }
+        
     }
 }
