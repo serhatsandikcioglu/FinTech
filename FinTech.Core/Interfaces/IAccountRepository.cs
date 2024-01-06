@@ -16,5 +16,6 @@ namespace FinTech.Core.Interfaces
         Task<Account> GetByAccountNumberAsync(string accountNumber);
         Task<bool> AccountIsExistByAccountNumberAsync(string accountNumber);
         Task<Account> GetByIdAsync(Guid accountId);
+        Task<Guid> GetUserIdById(Guid accountId);
     }
 }

@@ -40,5 +40,9 @@ namespace FinTech.Infrastructure.Repositories
         {
             return await _dbSet.Include(x=>x.ApplicationUser).Where(x => x.Id == accountId).FirstOrDefaultAsync();
         }
+        public async Task<Guid> GetUserIdById(Guid accountId)
+        {
+            return await _dbSet.Where(x => x.Id == accountId).Select(x => x.ApplicationUserId).SingleOrDefaultAsync();
+        }
     }
 }
