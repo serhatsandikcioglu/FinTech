@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using FinTech.Core.DTOs.LoanApplication;
+using FinTech.Core.Constans;
 
 namespace FinTech.API.Controllers
 {
@@ -22,30 +23,28 @@ namespace FinTech.API.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer,admin")]
+        [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<LoanApplicationDTO>>> Create(LoanApplicationCreateDTO loanApplicationCreateDTO)
         {
-            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _loanApplicationService.CreateAsync(userId, loanApplicationCreateDTO));
+            return CreateActionResultInstance(await _loanApplicationService.CreateAsync(loanApplicationCreateDTO));
         }
         [HttpGet("byUser")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "customer,admin")]
+        [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<List<LoanApplicationDTO>>>> GetAllByUserId()
         {
-            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _loanApplicationService.GetAllByUserIdAsync(userId));
+            return CreateActionResultInstance(await _loanApplicationService.GetAllByUserIdAsync());
         }
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "admin,loanOfficer")]
+        [Authorize(Roles = $"{RoleConstants.LoanOfficer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<List<LoanApplicationDTO>>>> GetAll()
         {
             return CreateActionResultInstance(await _loanApplicationService.GetAllAsync());
         }
         [HttpPut("evaluation/{loanApplicationId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "admin,loanOfficer")]
+        [Authorize(Roles = $"{RoleConstants.LoanOfficer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> LoanApplicationEvaluation(Guid loanApplicationId , LoanApplicationEvaluationDTO loanApplicationEvaluationDTO)
         {
             return CreateActionResultInstance( await _loanApplicationService.LoanApplicationEvaluationAsync(loanApplicationId,loanApplicationEvaluationDTO));

@@ -11,7 +11,7 @@ namespace FinTech.Service.Interfaces
 {
     public interface ISupportTicketService
     {
-        Task<CustomResponse<SupportTicketCreatedDTO>> CreateAsync(Guid userId, SupportTicketCreateDTO supportTicketCreateDTO);
+        Task<CustomResponse<SupportTicketCreatedDTO>> CreateAsync(SupportTicketCreateDTO supportTicketCreateDTO);
         Task<CustomResponse<SupportTicketDTO>> GetByWithoutPrioritizationStatusAsync();
         Task<CustomResponse<SupportTicketDTO>> GetByPriorityStatusAsync();
         Task<CustomResponse<NoContent>> ProcessAsync(Guid supportTicketId);

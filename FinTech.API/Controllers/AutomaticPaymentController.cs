@@ -13,7 +13,7 @@ namespace FinTech.API.Controllers
 {
     [Route("api/automaticPayments")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer", Roles = "customer,admin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
     public class AutomaticPaymentController : CustomBaseController
     {
         private readonly IAutomaticPaymentService _automaticPaymentService;
@@ -25,8 +25,7 @@ namespace FinTech.API.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomResponse<AutomaticPaymentDTO>>> Create(AutomaticPaymentCreateDTO automaticPaymentCreateDTO)
         {
-            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _automaticPaymentService.CreateAsync(userId,automaticPaymentCreateDTO));
+            return CreateActionResultInstance(await _automaticPaymentService.CreateAsync(automaticPaymentCreateDTO));
         }
         [HttpDelete("{automaticPaymentId}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> Delete(Guid automaticPaymentId)
@@ -36,8 +35,7 @@ namespace FinTech.API.Controllers
         [HttpGet("byUser")]
         public async Task<ActionResult<CustomResponse<List<AutomaticPaymentDTO>>>> GetAllByUserId()
         {
-            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _automaticPaymentService.GetAllByUserIdAsync(userId));
+            return CreateActionResultInstance(await _automaticPaymentService.GetAllByUserIdAsync());
         }
         [HttpPost("bill")]
         [AllowAnonymous]

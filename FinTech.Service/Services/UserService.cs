@@ -48,7 +48,7 @@ namespace FinTech.Service.Services
                 if (!result.Succeeded)
                     return CustomResponse<UserDTO>.Fail(StatusCodes.Status500InternalServerError, result.Errors.Select(x => x.Description).ToList());
 
-                await _userManager.AddToRoleAsync(appUser, "customer");
+                await _userManager.AddToRoleAsync(appUser, RoleConstants.Customer);
 
                 AccountCreateDTO accountCreateDTO = new AccountCreateDTO();
                 var accountResponse =  await _accountService.CreateAccountWithoutRulesAsync(appUser.Id, accountCreateDTO);

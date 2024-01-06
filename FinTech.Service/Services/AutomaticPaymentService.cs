@@ -22,22 +22,24 @@ namespace FinTech.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountActivityService _accountActivityService;
         private readonly IMapper _mapper;
+        private readonly IHttpContextData _httpContextData;
 
-        public AutomaticPaymentService(IUnitOfWork unitOfWork, IAccountActivityService accountActivityService, IMapper mapper)
+        public AutomaticPaymentService(IUnitOfWork unitOfWork, IAccountActivityService accountActivityService, IMapper mapper, IHttpContextData httpContextData)
         {
             _unitOfWork = unitOfWork;
             _accountActivityService = accountActivityService;
             _mapper = mapper;
+            _httpContextData = httpContextData;
         }
 
-        public async Task<CustomResponse<AutomaticPaymentDTO>> CreateAsync(Guid userId, AutomaticPaymentCreateDTO automaticPaymentCreateDTO)
+        public async Task<CustomResponse<AutomaticPaymentDTO>> CreateAsync(AutomaticPaymentCreateDTO automaticPaymentCreateDTO)
         {
             bool accountExist = await _unitOfWork.AccountRepository.AccountIsExistAsync(automaticPaymentCreateDTO.AccountId);
             if (!accountExist)
                 return CustomResponse<AutomaticPaymentDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
 
             AutomaticPayment automaticPayment = _mapper.Map<AutomaticPayment>(automaticPaymentCreateDTO);
-            automaticPayment.userId = userId;
+            automaticPayment.userId = Guid.Parse(_httpContextData.UserId!);
             await _unitOfWork.AutomaticPaymentRepository.AddAsync(automaticPayment);
             await _unitOfWork.SaveChangesAsync();
 
@@ -56,9 +58,9 @@ namespace FinTech.Service.Services
             return CustomResponse<NoContent>.Success(StatusCodes.Status204NoContent);
         }
 
-        public async Task<CustomResponse<List<AutomaticPaymentDTO>>> GetAllByUserIdAsync(Guid userId)
+        public async Task<CustomResponse<List<AutomaticPaymentDTO>>> GetAllByUserIdAsync()
         {
-           var automaticPayments = await _unitOfWork.AutomaticPaymentRepository.GetAllByUserIdAsync(userId);
+           var automaticPayments = await _unitOfWork.AutomaticPaymentRepository.GetAllByUserIdAsync(Guid.Parse(_httpContextData.UserId!));
             if (automaticPayments == null)
             {
                 return CustomResponse<List<AutomaticPaymentDTO>>.Fail(StatusCodes.Status200OK,ErrorMessageConstants.AutomaticPaymentNotFound);

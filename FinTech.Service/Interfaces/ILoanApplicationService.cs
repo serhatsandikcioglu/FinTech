@@ -10,9 +10,9 @@ namespace FinTech.Service.Interfaces
 {
     public interface ILoanApplicationService
     {
-        Task<CustomResponse<LoanApplicationDTO>> CreateAsync(Guid userId, LoanApplicationCreateDTO loanApplicationCreateDTO);
+        Task<CustomResponse<LoanApplicationDTO>> CreateAsync(LoanApplicationCreateDTO loanApplicationCreateDTO);
         Task<CustomResponse<NoContent>> LoanApplicationEvaluationAsync(Guid loanApplicationId, LoanApplicationEvaluationDTO loanApplicationEvaluationDTO);
-        Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserIdAsync(Guid userId);
+        Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserIdAsync();
         Task<CustomResponse<List<LoanApplicationDTO>>> GetAllAsync();
     }
 }

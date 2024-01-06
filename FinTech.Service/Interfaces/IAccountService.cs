@@ -17,6 +17,6 @@ namespace FinTech.Service.Interfaces
         Task<CustomResponse<AccountDTO>> CreateAccountWithoutRulesAsync(Guid userId, AccountCreateDTO accountCreateDTO);
         Task<CustomResponse<BalanceDTO>> GetBalanceByAccountIdAsync(Guid accountId);
         Task<CustomResponse<BalanceDTO>> UpdateBalanceAsync(Guid accountId, BalanceUpdateDTO balanceUpdateDTO);
-        Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(Guid userId, AccountCreateDTO accountCreateDTO);
+        Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(AccountCreateDTO accountCreateDTO);
     }
 }

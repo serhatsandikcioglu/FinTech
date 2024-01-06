@@ -13,7 +13,7 @@ namespace FinTech.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer", Roles = "manager,admin")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = $"{RoleConstants.Manager},{RoleConstants.Admin}")]
     public class UserController : CustomBaseController
     {
         private readonly IUserService _userService;

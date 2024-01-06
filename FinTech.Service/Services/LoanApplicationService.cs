@@ -20,11 +20,13 @@ namespace FinTech.Service.Services
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextData _httpContextData;
 
-        public LoanApplicationService(IMapper mapper, IUnitOfWork unitOfWork)
+        public LoanApplicationService(IMapper mapper, IUnitOfWork unitOfWork, IHttpContextData httpContextData)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _httpContextData = httpContextData;
         }
 
         private async Task<string> CalculateCreditScoreAsync(Guid applicationUserId, decimal monthlyIncome)
@@ -67,8 +69,9 @@ namespace FinTech.Service.Services
                 
         }
 
-        public async Task<CustomResponse<LoanApplicationDTO>> CreateAsync(Guid applicationUserId, LoanApplicationCreateDTO loanApplicationCreateDTO)
+        public async Task<CustomResponse<LoanApplicationDTO>> CreateAsync(LoanApplicationCreateDTO loanApplicationCreateDTO)
         {
+            var applicationUserId = Guid.Parse(_httpContextData.UserId!);
             LoanApplication loanApplication = _mapper.Map<LoanApplication>(loanApplicationCreateDTO);
             loanApplication.Status = Core.Enums.LoanApllicationStatus.Pending;
             loanApplication.Date = DateTime.UtcNow;
@@ -137,9 +140,9 @@ namespace FinTech.Service.Services
             }
             
         }
-        public async Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserIdAsync(Guid userId)
+        public async Task<CustomResponse<List<LoanApplicationDTO>>> GetAllByUserIdAsync()
         {
-           List<LoanApplication> loanApplications =  await _unitOfWork.LoanApplicationRepository.GetAllByUserIdAsync(userId);
+           List<LoanApplication> loanApplications =  await _unitOfWork.LoanApplicationRepository.GetAllByUserIdAsync(Guid.Parse(_httpContextData.UserId!));
 
             List<LoanApplicationDTO> loanApplicationDTOs = _mapper.Map<List<LoanApplicationDTO>>(loanApplications);
             return CustomResponse<List<LoanApplicationDTO>>.Success(StatusCodes.Status200OK,loanApplicationDTOs);

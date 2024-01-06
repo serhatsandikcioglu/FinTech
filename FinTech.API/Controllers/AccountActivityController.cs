@@ -11,7 +11,7 @@ namespace FinTech.API.Controllers
 {
     [Route("api/accountActivities")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer" , Roles = "customer,admin")]
+    [Authorize(AuthenticationSchemes = "Bearer" , Roles = $"{RoleConstants.Customer},{RoleConstants.Admin},{RoleConstants.Manager}")]
     public class AccountActivityController : CustomBaseController
     {
         private readonly IAccountActivityService _accountActivityService;

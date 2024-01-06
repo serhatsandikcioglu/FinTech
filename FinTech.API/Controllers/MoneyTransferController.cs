@@ -11,7 +11,7 @@ namespace FinTech.API.Controllers
 {
     [Route("api/moneyTransfers")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer" , Roles = "customer,admin")]
+    [Authorize(AuthenticationSchemes = "Bearer" , Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
     public class MoneyTransferController : CustomBaseController
     {
         private readonly IMoneyTransferService _moneyTransferService;

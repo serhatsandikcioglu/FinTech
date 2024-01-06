@@ -24,20 +24,19 @@ namespace FinTech.API.Controllers
             _accountService = accountService;
         }
         [HttpPost]
-        [Authorize(Roles = "customer,admin")]
+        [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<AccountDTO>>> Create(AccountCreateDTO accountCreateDTO)
         {
-            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _accountService.CreateAccountAccordingRulesAsync(userId, accountCreateDTO));
+            return CreateActionResultInstance(await _accountService.CreateAccountAccordingRulesAsync(accountCreateDTO));
         }
         [HttpGet("{accountId}/balance")]
-        [Authorize(Roles = "customer,admin")]
+        [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> GetBalance(Guid accountId)
         {
             return CreateActionResultInstance( await _accountService.GetBalanceByAccountIdAsync(accountId));
         }
         [HttpPost("{accountId}/updateBalance")]
-        [Authorize(Roles = "manager,admin")]
+        [Authorize(Roles = $"{RoleConstants.Manager},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> UpdateBalance(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
         {
             return CreateActionResultInstance( await _accountService.UpdateBalanceAsync(accountId,balanceUpdateDTO));

@@ -14,9 +14,9 @@ namespace FinTech.Service.Interfaces
     public interface IAutomaticPaymentService
     {
         Task<CustomResponse<NoContent>> ProcessAllAutomaticPaymentsAsync();
-        Task<CustomResponse<AutomaticPaymentDTO>> CreateAsync(Guid userId,AutomaticPaymentCreateDTO automaticPaymentCreateDTO);
+        Task<CustomResponse<AutomaticPaymentDTO>> CreateAsync(AutomaticPaymentCreateDTO automaticPaymentCreateDTO);
         Task<CustomResponse<NoContent>> DeleteAsync(Guid automaticPaymentId);
-        Task<CustomResponse<List<AutomaticPaymentDTO>>> GetAllByUserIdAsync(Guid userId);
+        Task<CustomResponse<List<AutomaticPaymentDTO>>> GetAllByUserIdAsync();
         Task<CustomResponse<NoContent>> CreateBill(Bill bill);
 
     }

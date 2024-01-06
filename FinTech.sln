@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinTech.Service", "FinTech.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinTech.Infrastructure", "FinTech.Infrastructure\FinTech.Infrastructure.csproj", "{793BB847-8AB6-40DB-A889-AA0CDCF5E3B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinTech.Test", "FinTech.Test\FinTech.Test.csproj", "{C9C1EF4D-9431-4D0E-A7FC-0240E285AFBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{793BB847-8AB6-40DB-A889-AA0CDCF5E3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{793BB847-8AB6-40DB-A889-AA0CDCF5E3B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{793BB847-8AB6-40DB-A889-AA0CDCF5E3B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9C1EF4D-9431-4D0E-A7FC-0240E285AFBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9C1EF4D-9431-4D0E-A7FC-0240E285AFBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9C1EF4D-9431-4D0E-A7FC-0240E285AFBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C1EF4D-9431-4D0E-A7FC-0240E285AFBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

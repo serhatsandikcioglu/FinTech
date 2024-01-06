@@ -29,14 +29,16 @@ namespace FinTech.Service.Services
         private readonly IMapper _mapper;
         private readonly IAccountActivityService _accountActivityService;
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
-        public AccountService(IMapper mapper, IUnitOfWork unitOfWork, IAccountActivityService accountActivityService)
+        private readonly IHttpContextData _httpContextData;
+        public AccountService(IMapper mapper, IUnitOfWork unitOfWork, IAccountActivityService accountActivityService, IHttpContextData httpContextData)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _accountActivityService = accountActivityService;
+            _httpContextData = httpContextData;
         }
 
-        public async Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(Guid applicationUserId, AccountCreateDTO accountCreateDTO)
+        public async Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(AccountCreateDTO accountCreateDTO)
         {
             if (accountCreateDTO.Balance < AccountConstants.MinimumInitialBalance)
                 return CustomResponse<AccountDTO>.Fail(StatusCodes.Status400BadRequest, $"{ErrorMessageConstants.InitialBalanceError}. Minimum Balance {AccountConstants.MinimumInitialBalance}");
@@ -45,7 +47,7 @@ namespace FinTech.Service.Services
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                var accountResponse = await CreateAccountWithoutRulesAsync(applicationUserId, accountCreateDTO);
+                var accountResponse = await CreateAccountWithoutRulesAsync(Guid.Parse(_httpContextData.UserId!), accountCreateDTO);
 
                 await AccountActivityCreateProcessAsync(accountCreateDTO.SenderAccountId,TransactionType.Withdrawal,accountCreateDTO.Balance);
                 await AccountActivityCreateProcessAsync(accountResponse.Data.Id, TransactionType.Deposit, accountCreateDTO.Balance);

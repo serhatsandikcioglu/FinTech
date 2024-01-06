@@ -47,6 +47,7 @@ namespace FinTech.Infrastructure
             services.AddScoped<IAutomaticPaymentService, AutomaticPaymentService>();
             services.AddScoped<IBillRepository, BillRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IHttpContextData, HttpContextData>();
 
             services.Configure<CustomTokenOption>(configuration.GetSection("TokenOption"));
 

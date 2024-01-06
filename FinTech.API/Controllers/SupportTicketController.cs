@@ -24,32 +24,31 @@ namespace FinTech.API.Controllers
             _supportTicketService = supportTicketService;
         }
         [HttpPost]
-        [Authorize(Roles = "customer,admin")]
+        [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<SupportTicketCreatedDTO>>> Create(SupportTicketCreateDTO supportTicketCreateDTO)
         {
-            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return CreateActionResultInstance(await _supportTicketService.CreateAsync(userId,supportTicketCreateDTO));
+            return CreateActionResultInstance(await _supportTicketService.CreateAsync(supportTicketCreateDTO));
         }
         [HttpGet("byWithoutPrioritizationStatus")]
-        [Authorize(Roles = "supportTicketAnalyst,admin")]
+        [Authorize(Roles = $"{RoleConstants.SupportTicketAnalyst},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<SupportTicketDTO>>> GetByWithoutPrioritizationStatus()
         {
             return CreateActionResultInstance(await _supportTicketService.GetByWithoutPrioritizationStatusAsync());
         }
         [HttpPost("determinePriortyLevel/{supportTicketId}")]
-        [Authorize(Roles = "supportTicketAnalyst,admin")]
+        [Authorize(Roles = $"{RoleConstants.SupportTicketAnalyst},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> DeterminePriortyLevel(Guid supportTicketId , TicketPriorityLevel ticketPriorityLevel)
         {
             return CreateActionResultInstance(await _supportTicketService.DeterminePriortyLevelAsync(supportTicketId, ticketPriorityLevel));
         }
         [HttpGet("byPriorityStatus")]
-        [Authorize(Roles = "customerSupport,admin")]
+        [Authorize(Roles = $"{RoleConstants.CustomerSupport},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<SupportTicketDTO>>> GetByPriorityStatus()
         {
             return CreateActionResultInstance(await _supportTicketService.GetByPriorityStatusAsync());
         }
         [HttpPost("process/{supportTicketId}")]
-        [Authorize(Roles = "customerSupport,admin")]
+        [Authorize(Roles = $"{RoleConstants.CustomerSupport},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<SupportTicketCreatedDTO>>> Process(Guid supportTicketId)
         {
             return CreateActionResultInstance(await _supportTicketService.ProcessAsync(supportTicketId));

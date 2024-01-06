@@ -19,16 +19,18 @@ namespace FinTech.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IHttpContextData _httpContextData;
 
-        public SupportTicketService(IUnitOfWork unitOfWork, IMapper mapper)
+        public SupportTicketService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextData httpContextData)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _httpContextData = httpContextData;
         }
-        public async Task<CustomResponse<SupportTicketCreatedDTO>> CreateAsync(Guid userId , SupportTicketCreateDTO supportTicketCreateDTO)
+        public async Task<CustomResponse<SupportTicketCreatedDTO>> CreateAsync(SupportTicketCreateDTO supportTicketCreateDTO)
         {
             SupportTicket supportTicket = _mapper.Map<SupportTicket>(supportTicketCreateDTO);
-            supportTicket.ApplicationUserId = userId;
+            supportTicket.ApplicationUserId = Guid.Parse(_httpContextData.UserId!);
             supportTicket.CreatedDate = DateTime.UtcNow;
             supportTicket.Status = TicketStatus.Pending;
 

@@ -23,26 +23,29 @@ namespace FinTech.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private static readonly Dictionary<Guid, SemaphoreSlim> _accountLocks = new Dictionary<Guid, SemaphoreSlim>();
-        private static readonly SemaphoreSlim _globalLock = new SemaphoreSlim(1, 1);
-        public AccountActivityService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IHttpContextData _httpContextData;
+        public AccountActivityService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextData httpContextData)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _httpContextData = httpContextData;
         }
 
         public async Task<CustomResponse<AccountActivityDTO>> CreateAsync(Guid accountId, AccountActivityCreateDTO accountActivityCreateDTO)
         {
             Account account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId);
+
+            if (!(Guid.Parse(_httpContextData.UserId!) == account.ApplicationUser.Id) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Admin) && !_httpContextData.UserRoleNames.Contains(RoleConstants.Manager))
+                return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status403Forbidden, ErrorMessageConstants.ForbiddenAccount);
+
             if (account == null)
                 return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
 
             if (accountActivityCreateDTO.TransactionType == TransactionType.Withdrawal && accountActivityCreateDTO.Amount > (await GetBalanceAsync(accountId)))
                 return CustomResponse<AccountActivityDTO>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.InsufficientFunds);
 
-            await _globalLock.WaitAsync();
             var accountLock = GetAccountLock(accountId);
             await accountLock.WaitAsync();
-            _globalLock.Release();
 
             try
             {
@@ -51,7 +54,6 @@ namespace FinTech.Service.Services
                 accountActivity.AccountId = account.Id;
 
                 await _unitOfWork.AccountActivityRepository.AddAsync(accountActivity);
-                Thread.Sleep(10000);
                 AccountActivityDTO accountActivityDTO = _mapper.Map<AccountActivityDTO>(accountActivity);
                 await _unitOfWork.SaveChangesAsync();
                 return CustomResponse<AccountActivityDTO>.Success(StatusCodes.Status201Created, accountActivityDTO);
