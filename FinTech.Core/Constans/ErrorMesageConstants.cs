@@ -18,7 +18,7 @@ namespace FinTech.Core.Constans
         public const string TransferLimitError = "Transfer Limit Exceeded";
         public const string IncorrectUsernameOrPassword = "Incorrect Username Or Password";
         public const string InvalidIdNumber = "ID Number Is Invalid";
-        public const string RoleOperationFailed = "User Does Not Have This Role";
+        public const string RoleOperationFailed = "Role Operation Failed";
         public const string UserNotFound = "User Not Found";
         public const string RoleNotFound = "Role Not Found";
         public const string SupportTicketNotFound = "Support Ticket Not Found";

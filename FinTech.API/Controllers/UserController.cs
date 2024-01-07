@@ -32,17 +32,17 @@ namespace FinTech.API.Controllers
         {
             return CreateActionResultInstance(await _userService.CreateUserAsync(userCreateDTO));
         }
-        [HttpGet("[action]/{userId}")]
+        [HttpGet("roles/{userId}")]
         public async Task<ActionResult<CustomResponse<UserRolesDTO>>> GetRolesFromUser(Guid userId)
         {
             return CreateActionResultInstance(await _userService.GetRolesAsync(userId));
         }
-        [HttpDelete("[action]/{userId}")]
+        [HttpDelete("roles/{userId}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> DeleteRoleFromUser(Guid userId, RoleDTO roleDTO)
         {
             return CreateActionResultInstance(await _userService.DeleteRoleAsync(userId,roleDTO));
         }
-        [HttpPost("[action]/{userId}")]
+        [HttpPost("roles/{userId}")]
         public async Task<ActionResult<CustomResponse<NoContent>>> AddRoleToUser(Guid userId, RoleDTO roleDTO)
         {
             return CreateActionResultInstance(await _userService.AssignRoleAsync(userId,roleDTO));
