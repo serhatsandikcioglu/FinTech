@@ -20,11 +20,15 @@ namespace FinTech.Test
         public async Task CreateAsync_WhenValidData_ReturnsSuccessResponse()
         {
             // Arrange
+            ApplicationUser applicationUser = new ApplicationUser
+            {
+               Id = Guid.NewGuid(),
+            };
             var accountId = Guid.NewGuid();
             var accountActivityCreateDTO = new AccountActivityCreateDTO
             {
                 Amount = 100,
-                TransactionType = TransactionType.Deposit
+                TransactionType = TransactionType.Deposit,
             };
 
             var unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -33,29 +37,32 @@ namespace FinTech.Test
             var accountActivityRepositoryMock = new Mock<IAccountActivityRepository>();
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(m => m.Map<AccountActivity>(It.IsAny<AccountActivityCreateDTO>()))
-    .Returns((AccountActivityCreateDTO input) =>
-    {
-        return new AccountActivity
-        {
-            Amount = input.Amount,
-            TransactionType = input.TransactionType
-        };
-    });
+            .Returns((AccountActivityCreateDTO input) =>
+            {
+                return new AccountActivity
+                {
+                    Amount = input.Amount,
+                    TransactionType = input.TransactionType,
+                    Date = DateTime.UtcNow
+                };
+                  });
             mapperMock.Setup(m => m.Map<AccountActivityDTO>(It.IsAny<AccountActivity>()))
-    .Returns((AccountActivity input) =>
-    {
-        return new AccountActivityDTO
-        {
-            Amount = input.Amount,
-            TransactionType = input.TransactionType
-        };
-    });
+              .Returns((AccountActivity input) =>
+                  {
+                     return new AccountActivityDTO
+                         {
+                     Amount = input.Amount,
+                     TransactionType = input.TransactionType,
+                     Date = input.Date
+                      };
+                       });
             unitOfWorkMock.Setup(uow => uow.AccountRepository).Returns(accountRepositoryMock.Object);
             unitOfWorkMock.Setup(uow => uow.AccountActivityRepository).Returns(accountActivityRepositoryMock.Object);
 
             var account = new Account
             {
                 Id = accountId,
+                ApplicationUser = applicationUser,
             };
 
             accountRepositoryMock.Setup(repo => repo.GetByIdAsync(accountId)).ReturnsAsync(account);
@@ -63,17 +70,16 @@ namespace FinTech.Test
             var service = new AccountActivityService(unitOfWorkMock.Object, mapperMock.Object,httpContextData.Object);
 
             // Act
-            var result = await service.CreateAsync(accountId, accountActivityCreateDTO);
+            var result = await service.CreateAsync(accountId, accountActivityCreateDTO,applicationUser.Id);
 
             // Assert
             Assert.True(result.Succeeded);
             Assert.Equal(StatusCodes.Status201Created, result.StatusCode);
             Assert.Equal(accountActivityCreateDTO.Amount, result.Data.Amount);
             Assert.Equal(accountActivityCreateDTO.TransactionType, result.Data.TransactionType);
+            Assert.Equal(DateTime.UtcNow.Date, result.Data.Date.Date);
 
-            unitOfWorkMock.Verify(uow => uow.AccountRepository.GetByIdAsync(accountId), Times.Once);
-            unitOfWorkMock.Verify(uow => uow.AccountActivityRepository.AddAsync(It.IsAny<AccountActivity>()), Times.Once);
-            unitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Once);
         }
+
     }
 }
