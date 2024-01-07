@@ -83,7 +83,9 @@ Projenin otomatik ödemeler işlevselliğini kapsar. Kullanıcılar, düzenli fa
 
 **Otomatik Ödemeleri Yönetme ve İptal Etme:** Kullanıcılar, otomatik ödemeleri yönetebilir ve istedikleri zaman bu ödemeleri iptal edebilirler.
 
-Bu bölümdeki işlevselliğin amacı, kullanıcılara düzenli fatura ödemelerini otomatikleştirme ve yönetme konusunda kolaylık sağlamaktır.
+Bu bölümdeki işlevselliğin amacı, kullanıcılara düzenli fatura ödemelerini otomatikleştirme ve yönetme konusunda kolaylık sağlamaktır.  
+
+Not: Bu bölümdeki faturalar tablosu dış bir varlığı temsil etmektedir. Otomatik ödeme işleminin testi ve tutarlılığı sebebiyle eklenmiştir.
 
 ### Destek Talepleri
 
