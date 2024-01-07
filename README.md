@@ -123,8 +123,10 @@ Bu projede, aşağıdaki kullanıcılar ve roller sistem başlatılırken oluşm
 
 - **Support Ticket Analyst**
   - Kullanıcı Adı: supportTicketAnalyst
-  - Şifre: Asd123*
+  - Şifre: Asd123*  
+
+## Projenin Çalışır Ekran Görüntüsü
+![Proje Ekran Görüntüsü](https://github.com/serhatsandikcioglu/FinTech/assets/124772332/321a884d-96d4-430a-ba2e-1d75f284b23f)
 
 ## Author
-
 - [@Serhat Sandıkçıoğlu](https://github.com/serhatsandikcioglu)
