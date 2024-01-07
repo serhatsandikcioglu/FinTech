@@ -46,7 +46,7 @@ Projenin para yatırma ve çekme işlevselliğini kapsar. Kullanıcılar, finans
 **Bakiye Tutarsızlığı Kontrolü:** Birden fazla işlem aynı anda gerçekleştiğinde, bakiye tutarsızlığını önlemek adına kilit mekanizması kullanılır. Bu, aynı hesaptaki işlemlerin birbirini etkilememesini ve bakiyenin doğru bir şekilde güncellenmesini sağlar.
 
 Bu bölümdeki işlevselliğin amacı, kullanıcıların güvenli ve tutarlı bir şekilde finansal işlemlerini gerçekleştirebilmelerini sağlamak ve sistemdeki finansal verilerin doğruluğunu korumaktır.
-### İletişim Kurma
+### Para Transferleri
 
 Projenin iç ve dış transfer işlevselliğini kapsar. Kullanıcılar, finansal kaynaklarını gönderen ve alıcı hesaplar arasında güvenli bir şekilde aktarabilmek adına bu işlevselliği kullanabilirler. Aşağıda, bu bölümdeki temel işlevselliğin detayları yer almaktadır:
 
