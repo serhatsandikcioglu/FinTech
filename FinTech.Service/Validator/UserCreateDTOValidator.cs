@@ -13,11 +13,11 @@ namespace FinTech.Service.Validator
         public UserCreateDTOValidator() 
         {
             RuleFor(x => x.Name)
-          .NotNull().WithMessage("Name cannot be empty.")
+          .NotEmpty().WithMessage("Name cannot be empty.")
           .MinimumLength(5);
 
             RuleFor(x => x.Surname)
-                .NotNull().WithMessage("Surname cannot be empty.");
+                .NotEmpty().WithMessage("Surname cannot be empty.");
 
             RuleFor(x => x.Password)
            .NotEmpty().WithMessage("Password cannot be empty.")

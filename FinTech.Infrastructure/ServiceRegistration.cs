@@ -13,11 +13,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Quartz;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using System.Reflection;
+using FinTech.Service.Validator;
 
 namespace FinTech.Infrastructure
 {
@@ -48,6 +53,7 @@ namespace FinTech.Infrastructure
             services.AddScoped<IBillRepository, BillRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IHttpContextData, HttpContextData>();
+            services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AccountCreateDTOValidator>());
 
             services.Configure<CustomTokenOption>(configuration.GetSection("TokenOption"));
 

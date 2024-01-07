@@ -115,7 +115,7 @@ namespace FinTech.Service.Services
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.AccountNotFound);
 
             if (amount > MoneyTransferConstants.PerTransactionTransferLimit)
-                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.TransferLimitError);
+                return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, $"{ErrorMessageConstants.TransferLimitError}. Daily limit:{ErrorMessageConstants.TransferLimitError}");
 
             var (isWithinLimit, remainingLimit) = await CalculateDailyTransferLimitAsync(senderAccountId, amount);
 

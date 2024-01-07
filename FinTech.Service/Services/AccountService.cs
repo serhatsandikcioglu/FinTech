@@ -31,6 +31,7 @@ namespace FinTech.Service.Services
         private readonly IAccountActivityService _accountActivityService;
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly IHttpContextData _httpContextData;
+
         public AccountService(IMapper mapper, IUnitOfWork unitOfWork, IAccountActivityService accountActivityService, IHttpContextData httpContextData)
         {
             _mapper = mapper;
