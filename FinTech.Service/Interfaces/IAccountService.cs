@@ -18,5 +18,6 @@ namespace FinTech.Service.Interfaces
         Task<CustomResponse<BalanceDTO>> GetBalanceByAccountIdAsync(Guid accountId);
         Task<CustomResponse<BalanceDTO>> UpdateBalanceAsync(Guid accountId, BalanceUpdateDTO balanceUpdateDTO);
         Task<CustomResponse<AccountDTO>> CreateAccountAccordingRulesAsync(AccountCreateDTO accountCreateDTO);
+        Task<CustomResponse<AccountDTO>> GetById(Guid accountId);
     }
 }

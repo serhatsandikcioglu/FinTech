@@ -29,17 +29,23 @@ namespace FinTech.API.Controllers
         {
             return CreateActionResultInstance(await _accountService.CreateAccountAccordingRulesAsync(accountCreateDTO));
         }
-        [HttpGet("{accountId}/balance")]
+        [HttpGet("balance/{accountId}")]
         [Authorize(Roles = $"{RoleConstants.Customer},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> GetBalance(Guid accountId)
         {
             return CreateActionResultInstance( await _accountService.GetBalanceByAccountIdAsync(accountId));
         }
-        [HttpPost("{accountId}/updateBalance")]
+        [HttpPost("balance/{accountId}")]
         [Authorize(Roles = $"{RoleConstants.Manager},{RoleConstants.Admin}")]
         public async Task<ActionResult<CustomResponse<BalanceDTO>>> UpdateBalance(Guid accountId, BalanceUpdateDTO balanceUpdateDTO)
         {
             return CreateActionResultInstance( await _accountService.UpdateBalanceAsync(accountId,balanceUpdateDTO));
+        }
+        [HttpGet("{accountId}")]
+        [Authorize(Roles = $"{RoleConstants.Manager},{RoleConstants.Admin}")]
+        public async Task<ActionResult<CustomResponse<Account>>> GetById(Guid accountId)
+        {
+            return CreateActionResultInstance(await _accountService.GetById(accountId));
         }
     }
 }

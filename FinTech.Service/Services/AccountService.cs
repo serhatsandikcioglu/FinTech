@@ -83,6 +83,15 @@ namespace FinTech.Service.Services
             }
                 
         }
+        public async Task<CustomResponse<AccountDTO>> GetById(Guid accountId)
+        {
+            Account account = await _unitOfWork.AccountRepository.GetByIdAsync(accountId);
+            if (account == null)
+                return CustomResponse<AccountDTO>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.AccountNotFound);
+
+            AccountDTO accountDTO = _mapper.Map<AccountDTO>(account);
+            return CustomResponse<AccountDTO>.Success(StatusCodes.Status200OK, accountDTO);
+        }
 
         private async Task<string> CreateAccountNumberAsync()
         {

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using FinTech.Core.DTOs.LoanApplication;
 using FinTech.Core.Constans;
+using FinTech.Core.Enums;
 
 namespace FinTech.API.Controllers
 {
@@ -43,9 +44,9 @@ namespace FinTech.API.Controllers
         }
         [HttpPut("evaluation/{loanApplicationId}")]
         [Authorize(Roles = $"{RoleConstants.LoanOfficer},{RoleConstants.Admin}")]
-        public async Task<ActionResult<CustomResponse<NoContent>>> LoanApplicationEvaluation(Guid loanApplicationId , LoanApplicationEvaluationDTO loanApplicationEvaluationDTO)
+        public async Task<ActionResult<CustomResponse<NoContent>>> LoanApplicationEvaluation(Guid loanApplicationId , LoanApllicationStatus loanApllicationStatus)
         {
-            return CreateActionResultInstance( await _loanApplicationService.LoanApplicationEvaluationAsync(loanApplicationId,loanApplicationEvaluationDTO));
+            return CreateActionResultInstance( await _loanApplicationService.LoanApplicationEvaluationAsync(loanApplicationId, loanApllicationStatus));
         }
     }
 }

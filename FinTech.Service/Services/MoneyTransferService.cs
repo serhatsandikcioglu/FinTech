@@ -30,7 +30,7 @@ namespace FinTech.Service.Services
             _mapper = mapper;
             _accountActivityService = accountActivityService;
         }
-        private async Task<CustomResponse<NoContent>> PerformTransferAsync(MoneyTransfer moneyTransfer)
+        private async Task<CustomResponse<NoContent>> PerformTransferAsync(MoneyTransfer moneyTransfer,Guid? userId = null)
         {
             var checkResult = await PerformMoneyTransferChecksAsync(moneyTransfer.ReceiverAccountId, moneyTransfer.SenderAccountId, moneyTransfer.Amount);
             if (!checkResult.Succeeded)
@@ -41,7 +41,7 @@ namespace FinTech.Service.Services
                 await _unitOfWork.BeginTransactionAsync();
 
                 await AccountActivityCreateProcessAsync(moneyTransfer.SenderAccountId, TransactionType.Withdrawal, moneyTransfer.Amount);
-                await AccountActivityCreateProcessAsync(moneyTransfer.ReceiverAccountId, TransactionType.Deposit, moneyTransfer.Amount);
+                await AccountActivityCreateProcessAsync(moneyTransfer.ReceiverAccountId, TransactionType.Deposit, moneyTransfer.Amount , userId);
 
                 moneyTransfer.Date = DateTime.UtcNow;
 
@@ -71,7 +71,7 @@ namespace FinTech.Service.Services
 
             MoneyTransfer moneyTransfer = _mapper.Map<MoneyTransfer>(externalTransferCreateDTO);
             moneyTransfer.ReceiverAccountId = receiverAccount.Id;
-            return await PerformTransferAsync(moneyTransfer);
+            return await PerformTransferAsync(moneyTransfer,receiverUser.Id);
         }
 
         public async Task<CustomResponse<NoContent>> InternalTransferAsync(InternalTransferCreateDTO internalTransferCreateDTO)
@@ -94,7 +94,7 @@ namespace FinTech.Service.Services
 
             return (false,remainingLimit);
         }
-        private async Task AccountActivityCreateProcessAsync(Guid accountId, TransactionType transactionType, decimal amount)
+        private async Task AccountActivityCreateProcessAsync(Guid accountId, TransactionType transactionType, decimal amount, Guid? userId = null)
         {
             var accountActivityCreateDTO = new AccountActivityCreateDTO
             {
@@ -102,7 +102,7 @@ namespace FinTech.Service.Services
                 TransactionType = transactionType
             };
 
-            var processResponse = await _accountActivityService.CreateAsync(accountId, accountActivityCreateDTO);
+            var processResponse = await _accountActivityService.CreateAsync(accountId, accountActivityCreateDTO,userId);
 
             if (!processResponse.Succeeded)
             {

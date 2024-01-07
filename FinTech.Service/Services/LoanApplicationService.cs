@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FinTech.Core.DTOs.LoanApplication;
 using FinTech.Core.Constans;
+using FinTech.Core.Enums;
 
 namespace FinTech.Service.Services
 {
@@ -83,21 +84,21 @@ namespace FinTech.Service.Services
             await _unitOfWork.SaveChangesAsync();
             return CustomResponse<LoanApplicationDTO>.Success(StatusCodes.Status201Created, loanApplicationDTO);
         }
-        public async Task<CustomResponse<NoContent>> LoanApplicationEvaluationAsync(Guid loanApplicationId, LoanApplicationEvaluationDTO loanApplicationEvaluationDTO)
+        public async Task<CustomResponse<NoContent>> LoanApplicationEvaluationAsync(Guid loanApplicationId, LoanApllicationStatus loanApllicationStatus)
         {
             LoanApplication loanApplication = await _unitOfWork.LoanApplicationRepository.GetByIdAsync(loanApplicationId);
             if (loanApplication == null)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status404NotFound, ErrorMessageConstants.LoanApplicationNotFound);
-            if (loanApplication.Status != Core.Enums.LoanApllicationStatus.Pending)
+            if (loanApplication.Status != LoanApllicationStatus.Pending)
                 return CustomResponse<NoContent>.Fail(StatusCodes.Status400BadRequest, ErrorMessageConstants.LoanApplicationProcessed);
 
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                loanApplication.Status = loanApplicationEvaluationDTO.LoanApllicationStatus;
+                loanApplication.Status = loanApllicationStatus;
                 await _unitOfWork.SaveChangesAsync();
 
-                if (loanApplication.Status == Core.Enums.LoanApllicationStatus.Approved)
+                if (loanApplication.Status == LoanApllicationStatus.Approved)
                 {
                     await CreateRepaymentPlanAsync(loanApplicationId, loanApplication.Amount, loanApplication.MaturityTerm);
                 }
