@@ -190,7 +190,7 @@ namespace FinTech.Service.Services
 
             var processResponse = await _accountActivityService.CreateAsync(accountId, accountActivityCreateDTO);
 
-            if (!processResponse.Succeeded)
+            if (processResponse.Error != null)
             {
                 throw new Exception(processResponse.Error.Details[0].ToString());
             }

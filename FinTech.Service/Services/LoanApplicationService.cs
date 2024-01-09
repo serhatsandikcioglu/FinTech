@@ -116,15 +116,15 @@ namespace FinTech.Service.Services
         {
             try
             {
-                var InterestFactor = Math.Pow(1 + LoanApplicationConstants.MonthlyInterestRate, maturityTerm);
-                var MonthlyPayment = (((decimal)InterestFactor * (decimal)LoanApplicationConstants.MonthlyInterestRate) / ((decimal)InterestFactor - 1)) * amount;
+                var interestFactor = Math.Pow(1 + LoanApplicationConstants.MonthlyInterestRate, maturityTerm);
+                var monthlyPayment = (((decimal)interestFactor * (decimal)LoanApplicationConstants.MonthlyInterestRate) / ((decimal)interestFactor - 1)) * amount;
 
                 for (int i = 1; i <= maturityTerm; i++)
                 {
                     RepaymentPlan repaymentPlan = new RepaymentPlan
                     {
                         LoanApplicationId = loanApplicationId,
-                        AmountDue = MonthlyPayment,
+                        AmountDue = monthlyPayment,
                         PaymentStatus = Core.Enums.PaymentStatus.Unpaid,
                         InstallmentNumber = i,
                         DueDate = DateTime.UtcNow.AddMonths(i)
