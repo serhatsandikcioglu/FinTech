@@ -93,7 +93,7 @@ namespace FinTech.Service.Services
                             };
                             var paymentResponse = await _accountActivityService.CreateAsync(automaticPayment.AccountId, accountActivityCreateDTO,userId);
 
-                            if (paymentResponse.Succeeded)
+                            if (paymentResponse.Error == null)
                                 bill.IsPaid = true;
 
                             await _unitOfWork.SaveChangesAsync();
